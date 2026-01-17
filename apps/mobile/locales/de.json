@@ -1,0 +1,112 @@
+{
+  "app": {
+    "name": "Alles Gut",
+    "tagline": "Dein digitales Lebenszeichen"
+  },
+  "auth": {
+    "getStarted": "Jetzt starten",
+    "alreadyRegistered": "Bereits registriert? Anmelden",
+    "howToRegister": "Wie möchtest du dich registrieren?",
+    "withPhone": "Mit Handynummer",
+    "withEmail": "Mit E-Mail",
+    "sendCodeInfo": "Wir senden dir einen Bestätigungscode. Kein Passwort nötig.",
+    "enterEmail": "Deine E-Mail-Adresse",
+    "enterPhone": "Deine Handynummer",
+    "requestCode": "Code anfordern",
+    "emailPrivacyNote": "Deine E-Mail wird verschlüsselt gespeichert und nur für die Anmeldung und Notfall-Benachrichtigungen verwendet.",
+    "phonePrivacyNote": "Deine Handynummer wird verschlüsselt gespeichert und nur für die Anmeldung verwendet.",
+    "enterCode": "Bestätigungscode eingeben",
+    "codeSentTo": "Gesendet an:",
+    "resendCode": "Code erneut senden",
+    "displayNameQuestion": "Wie sollen dich deine Kontakte sehen?",
+    "displayNameHint": "Du kannst einen Spitznamen oder deinen echten Namen verwenden.",
+    "intervalQuestion": "Wie oft möchtest du dich melden?",
+    "intervalHint": "Nach Ablauf dieser Zeit + 6 Stunden Karenzzeit werden deine Kontakte benachrichtigt.",
+    "every24Hours": "Alle 24 Stunden",
+    "every48Hours": "Alle 48 Stunden",
+    "every72Hours": "Alle 72 Stunden",
+    "everyWeek": "Einmal pro Woche",
+    "recommended": "(empfohlen)",
+    "continue": "Weiter",
+    "done": "Fertig"
+  },
+  "home": {
+    "greeting": "Hallo, {name}!",
+    "lastCheckIn": "Dein letztes Lebenszeichen:",
+    "tapToCheckIn": "Tippe, um dich zu melden",
+    "checkInButton": "ALLES GUT",
+    "nextDeadline": "Nächste Frist:",
+    "hoursRemaining": "(noch {hours} Stunden)",
+    "contactsWillBeNotified": "{count} Kontakte werden benachrichtigt",
+    "checkInSuccess": "Lebenszeichen gesendet!",
+    "warningCheckInSoon": "Bitte melde dich bald!",
+    "onlyHoursLeft": "Nur noch {hours} Stunden!"
+  },
+  "contacts": {
+    "title": "Kontakte",
+    "emergencyContacts": "Deine Notfallkontakte",
+    "countOf": "({count}/{max})",
+    "active": "Aktiv",
+    "pending": "Einladung ausstehend",
+    "addedOn": "Hinzugefügt am {date}",
+    "inviteContact": "Kontakt einladen",
+    "inviteTitle": "Kontakt einladen",
+    "inviteDescription": "Teile diesen Link oder QR-Code mit der Person, die dich im Notfall benachrichtigt werden soll.",
+    "or": "ODER",
+    "copyLink": "Link kopieren",
+    "shareLink": "Link teilen",
+    "linkValidFor": "Der Link ist 7 Tage gültig",
+    "removeContact": "Kontakt entfernen",
+    "removeConfirm": "Möchtest du {name} wirklich als Notfallkontakt entfernen?"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "profile": "PROFIL",
+    "displayName": "Anzeigename",
+    "checkIn": "CHECK-IN",
+    "interval": "Intervall",
+    "pause": "Pausieren",
+    "pauseSubtitle": "Für Urlaub/Reisen",
+    "pauseActive": "Check-in ist pausiert",
+    "notifications": "BENACHRICHTIGUNGEN",
+    "reminders": "Erinnerungen",
+    "emailBackup": "E-Mail-Backup",
+    "privacy": "DATENSCHUTZ",
+    "privacyPolicy": "Datenschutzerklärung",
+    "exportData": "Meine Daten exportieren",
+    "deleteAccount": "Konto löschen",
+    "deleteConfirm": "Möchtest du dein Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "app": "APP",
+    "about": "Über Alles Gut",
+    "imprint": "Impressum",
+    "version": "Version"
+  },
+  "alerts": {
+    "title": "Wichtige Mitteilung",
+    "message": "{name} hat sich seit {hours} Stunden nicht gemeldet. Bitte prüfe, ob alles in Ordnung ist."
+  },
+  "common": {
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
+    "save": "Speichern",
+    "back": "Zurück",
+    "loading": "Laden...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "tomorrow": "Morgen"
+  },
+  "privacy": {
+    "dataStaysPrivate": "Deine Daten bleiben privat",
+    "gdprCompliant": "DSGVO-konform",
+    "endToEndEncrypted": "Ende-zu-Ende verschlüsselt"
+  },
+  "time": {
+    "hours": "{count} Stunden",
+    "hour": "1 Stunde",
+    "minutes": "{count} Minuten",
+    "minute": "1 Minute"
+  }
+}
