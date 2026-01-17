@@ -6,7 +6,10 @@
       "Bash(psql:*)",
       "Bash(brew install:*)",
       "Bash(brew services start:*)",
-      "Bash(/opt/homebrew/opt/postgresql@16/bin/psql:*)"
+      "Bash(/opt/homebrew/opt/postgresql@16/bin/psql:*)",
+      "Bash(npx expo start --clear)",
+      "Bash(npx expo install --fix)",
+      "Bash(npx expo install:*)"
     ]
   }
 }

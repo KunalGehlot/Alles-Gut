@@ -14,8 +14,12 @@ export async function sendVerificationCode({
   to,
   code,
 }: SendVerificationCodeParams): Promise<void> {
+  console.log(`Attempting to send verification code to ${to}`);
+  console.log(`Using FROM_EMAIL: ${FROM_EMAIL}`);
+  console.log(`RESEND_API_KEY present: ${!!process.env.RESEND_API_KEY}`);
+
   try {
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: `${APP_NAME} <${FROM_EMAIL}>`,
       to,
       subject: `Dein Bestätigungscode: ${code}`,
@@ -59,7 +63,12 @@ export async function sendVerificationCode({
       text: `Dein Alles Gut Bestätigungscode: ${code}\n\nDer Code ist 10 Minuten gültig.\n\nFalls du diese E-Mail nicht angefordert hast, kannst du sie ignorieren.`,
     });
 
-    console.log(`Verification code sent to ${to}`);
+    if (error) {
+      console.error('Resend API error:', error);
+      throw new Error(`Resend error: ${error.message}`);
+    }
+
+    console.log(`Verification code sent to ${to}, email ID: ${data?.id}`);
   } catch (error) {
     console.error('Failed to send verification email:', error);
     throw new Error('Failed to send verification email');
