@@ -731,6 +731,16 @@ RN_SCRIPT="$("$NODE_BINARY" --print "require('path').dirname(require.resolve('re
 
 > **Note:** The `node_modules` fix is temporary and will be lost on reinstall. Consider using `patch-package` to persist it, or rename the project folder to avoid spaces.
 
+#### "Unable to resolve module expo-device" error
+**Cause:** The `expo-device` package is required by the notifications service but not installed.
+**Solution:**
+```bash
+cd apps/mobile
+npx expo install expo-device
+cd ios && pod install
+```
+Then rebuild the app with `npx expo run:ios`.
+
 #### API can't connect to PostgreSQL
 **Solution:**
 ```bash
