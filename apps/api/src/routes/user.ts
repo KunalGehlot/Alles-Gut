@@ -102,6 +102,36 @@ router.patch('/me', async (req: Request, res: Response) => {
     if (updates.isPaused !== undefined) {
       setClauses.push(`is_paused = $${paramIndex++}`);
       values.push(updates.isPaused);
+
+      // If unpausing, reset the deadline
+      if (updates.isPaused === false) {
+        // Need to get current interval if not being updated
+        let interval = updates.checkInIntervalHours;
+
+        if (interval === undefined) {
+          const userResult = await db.query<{ check_in_interval_hours: number }>(
+            'SELECT check_in_interval_hours FROM users WHERE id = $1',
+            [userId]
+          );
+          if (userResult.rows[0]) {
+            interval = userResult.rows[0].check_in_interval_hours;
+          }
+        }
+
+        if (interval !== undefined) {
+          const now = new Date();
+          const nextDeadline = new Date(
+            now.getTime() + (interval + 6) * 60 * 60 * 1000 // +6 for grace period
+          );
+          setClauses.push(`next_deadline = $${paramIndex++}`);
+          values.push(nextDeadline);
+
+          // Also reset last_check_in to now so the cycle starts fresh? 
+          // Or leave it? If we leave it, it might look like they haven't checked in for a long time.
+          // But technically they were paused. 
+          // Let's just set next_deadline for now as requested.
+        }
+      }
     }
 
     if (updates.reminderEnabled !== undefined) {
