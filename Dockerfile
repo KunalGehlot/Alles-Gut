@@ -20,7 +20,6 @@ RUN npm install --legacy-peer-deps
 # Copy source code
 COPY apps/api ./apps/api
 COPY packages/shared ./packages/shared
-COPY tsconfig.json ./
 
 # Build shared first, then API
 WORKDIR /app/packages/shared
