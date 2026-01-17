@@ -67,7 +67,8 @@ export default function VerifyScreen() {
       if (isNewUser) {
         router.replace('/(auth)/setup-name');
       } else {
-        router.replace('/(main)');
+        // Navigate to root - index.tsx will redirect to (main) since user is authenticated
+        router.replace('/');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ungültiger Code');
@@ -121,7 +122,7 @@ export default function VerifyScreen() {
           ))}
         </View>
 
-        {/* Hidden input for keyboard */}
+        {/* Hidden input for keyboard with iOS SMS autofill */}
         <TextInput
           ref={inputRef}
           style={styles.hiddenInput}
@@ -130,6 +131,8 @@ export default function VerifyScreen() {
           keyboardType="number-pad"
           maxLength={CODE_LENGTH}
           autoFocus
+          textContentType="oneTimeCode"
+          autoComplete="one-time-code"
         />
 
         {error && <Text style={styles.errorText}>{error}</Text>}

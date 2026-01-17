@@ -35,7 +35,8 @@ export default function SetupIntervalScreen() {
 
     try {
       await updateProfile(displayName, selectedInterval);
-      router.replace('/(main)');
+      // Navigate to root - index.tsx will redirect to (main) since user is authenticated
+      router.replace('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten.');
     } finally {

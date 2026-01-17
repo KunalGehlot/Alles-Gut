@@ -70,7 +70,7 @@ export default function SettingsScreen() {
           onPress: async () => {
             try {
               await api.deleteAccount();
-              router.replace('/(auth)/welcome');
+              router.replace('/');
             } catch {
               Alert.alert('Fehler', 'Konto konnte nicht gelöscht werden.');
             }
@@ -84,7 +84,7 @@ export default function SettingsScreen() {
     setIsLoggingOut(true);
     try {
       await logout();
-      router.replace('/(auth)/welcome');
+      router.replace('/');
     } catch {
       Alert.alert('Fehler', 'Abmeldung fehlgeschlagen.');
     } finally {
