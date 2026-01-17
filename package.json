@@ -15,11 +15,15 @@
     "api": "npm run dev --workspace=apps/api"
   },
   "devDependencies": {
+    "@types/react": "~18.3.0",
     "turbo": "^2.0.0",
     "typescript": "^5.3.0"
   },
   "packageManager": "npm@10.0.0",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "react-native-web": "^0.21.0"
   }
 }

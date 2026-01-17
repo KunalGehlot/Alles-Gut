@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "scheme": "allesgut",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -46,7 +46,7 @@
         }
       ],
       [
-        "expo-barcode-scanner",
+        "expo-camera",
         {
           "cameraPermission": "Kamera wird benötigt um QR-Codes zu scannen"
         }
