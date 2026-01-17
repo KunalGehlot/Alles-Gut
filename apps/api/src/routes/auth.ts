@@ -168,7 +168,7 @@ router.post('/verify', async (req: Request, res: Response) => {
       await db.query(
         `INSERT INTO users (id, encrypted_display_name, encrypted_contact_info, contact_type)
          VALUES ($1, $2, $3, $4)`,
-        [userId, encryptedContactInfo, encryptedDisplayName, 'email']
+        [userId, encryptedDisplayName, encryptedContactInfo, 'email']
       );
     }
 

@@ -741,6 +741,15 @@ cd ios && pod install
 ```
 Then rebuild the app with `npx expo run:ios`.
 
+#### Profile resets after logout/login (onboarding repeats)
+**Cause:** A bug in `apps/api/src/routes/auth.ts` where SQL INSERT parameters were swapped, corrupting user data storage.
+**Solution:** This was fixed by correcting the parameter order in the user creation query (line 171):
+```diff
+- [userId, encryptedContactInfo, encryptedDisplayName, 'email']
++ [userId, encryptedDisplayName, encryptedContactInfo, 'email']
+```
+If you have existing corrupted users in your database, you may need to delete them and re-register.
+
 #### API can't connect to PostgreSQL
 **Solution:**
 ```bash
