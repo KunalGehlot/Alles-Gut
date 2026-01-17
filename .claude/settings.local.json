@@ -9,7 +9,8 @@
       "Bash(/opt/homebrew/opt/postgresql@16/bin/psql:*)",
       "Bash(npx expo start --clear)",
       "Bash(npx expo install --fix)",
-      "Bash(npx expo install:*)"
+      "Bash(npx expo install:*)",
+      "Bash(npm run build:*)"
     ]
   }
 }
