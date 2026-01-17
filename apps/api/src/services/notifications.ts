@@ -67,7 +67,7 @@ export async function sendAlertNotifications({
     .filter(token => Expo.isExpoPushToken(token))
     .map(token => ({
       to: token,
-      sound: 'alert.wav', // Custom alert sound
+      sound: 'default', // Use system default sound
       title: '🚨 NOTFALL - Lebenszeichen fehlt',
       body: `${userName} hat sich seit ${hoursSinceCheckIn} Stunden nicht gemeldet. Bitte prüfe, ob alles in Ordnung ist.`,
       priority: 'high' as const,

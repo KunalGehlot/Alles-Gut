@@ -1,0 +1,11 @@
+<resources>
+  <string name="app">"[object Object]"</string>
+  <string name="auth">"[object Object]"</string>
+  <string name="home">"[object Object]"</string>
+  <string name="contacts">"[object Object]"</string>
+  <string name="settings">"[object Object]"</string>
+  <string name="alerts">"[object Object]"</string>
+  <string name="common">"[object Object]"</string>
+  <string name="privacy">"[object Object]"</string>
+  <string name="time">"[object Object]"</string>
+</resources>

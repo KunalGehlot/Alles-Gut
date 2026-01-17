@@ -19,7 +19,12 @@
       "Bash(kill:*)",
       "Bash(lsof:*)",
       "Bash(xargs kill:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(head:*)",
+      "Bash(npx expo prebuild:*)",
+      "Bash(ls:*)",
+      "Bash(file:*)",
+      "Bash(python3:*)"
     ]
   }
 }

@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "scheme": "allesgut",
     "userInterfaceStyle": "light",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -48,14 +48,7 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#2D7D46",
-          "sounds": ["./assets/sounds/alert.wav"],
-          "defaultChannel": {
-            "name": "default",
-            "importance": 4,
-            "vibrationPattern": [0, 250, 250, 250],
-            "lightColor": "#FF2D7D46"
-          }
+          "color": "#2D7D46"
         }
       ],
       [

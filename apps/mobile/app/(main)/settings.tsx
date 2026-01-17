@@ -202,7 +202,7 @@ export default function SettingsScreen() {
             title="Erinnerungen"
             subtitle="Vor Ablauf der Check-in-Frist"
             switchValue={reminderEnabled}
-            onSwitchChange={setReminderEnabled}
+            onSwitchChange={handleToggleReminder}
           />
         </ListSection>
 

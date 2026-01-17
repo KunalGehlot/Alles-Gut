@@ -33,7 +33,7 @@ export async function setupNotificationChannels(): Promise<void> {
     lightColor: '#FF0000',
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     bypassDnd: true, // Bypass Do Not Disturb
-    sound: 'alert.wav',
+    sound: 'default', // Use system default sound
     enableLights: true,
     enableVibrate: true,
   });
