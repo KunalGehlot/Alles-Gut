@@ -1,39 +1,29 @@
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ScrollView,
-  Switch,
-  Alert,
-  Linking,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Colors } from '@/constants/colors';
-import { Typography, Spacing, BorderRadius } from '@/constants/typography';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Typography, Spacing } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/services/api';
+import { ListSection, ListRow, Button } from '@/components';
 
-const CHECK_IN_INTERVALS = [
-  { value: 24, label: 'Alle 24 Stunden' },
-  { value: 48, label: 'Alle 48 Stunden' },
-  { value: 72, label: 'Alle 72 Stunden' },
-  { value: 168, label: 'Einmal pro Woche' },
-];
+const CHECK_IN_INTERVALS: Record<number, string> = {
+  24: 'Alle 24 Stunden',
+  48: 'Alle 48 Stunden',
+  72: 'Alle 72 Stunden',
+  168: 'Einmal pro Woche',
+};
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const { user, logout, refreshUser } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isPaused, setIsPaused] = useState(user?.isPaused ?? false);
   const [reminderEnabled, setReminderEnabled] = useState(true);
-  const [emailBackupEnabled, setEmailBackupEnabled] = useState(true);
 
-  const currentInterval = CHECK_IN_INTERVALS.find(
-    (i) => i.value === user?.checkInIntervalHours
-  ) || CHECK_IN_INTERVALS[1];
+  const currentInterval = CHECK_IN_INTERVALS[user?.checkInIntervalHours ?? 48];
 
   const handleTogglePause = async (value: boolean) => {
     setIsPaused(value);
@@ -51,7 +41,19 @@ export default function SettingsScreen() {
       const data = await api.exportData();
       Alert.alert(
         'Daten exportiert',
-        `Deine Daten wurden exportiert:\n\n${JSON.stringify(data, null, 2).slice(0, 500)}...`
+        'Deine Daten wurden erfolgreich exportiert.',
+        [
+          {
+            text: 'Details anzeigen',
+            onPress: () => {
+              Alert.alert(
+                'Exportierte Daten',
+                JSON.stringify(data, null, 2).slice(0, 1000) + '...'
+              );
+            },
+          },
+          { text: 'OK' },
+        ]
       );
     } catch {
       Alert.alert('Fehler', 'Daten konnten nicht exportiert werden.');
@@ -61,11 +63,11 @@ export default function SettingsScreen() {
   const handleDeleteAccount = () => {
     Alert.alert(
       'Konto löschen',
-      'Möchtest du dein Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.',
+      'Möchtest du dein Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden. Alle deine Daten werden unwiderruflich gelöscht.',
       [
         { text: 'Abbrechen', style: 'cancel' },
         {
-          text: 'Löschen',
+          text: 'Konto löschen',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -92,18 +94,10 @@ export default function SettingsScreen() {
     }
   };
 
-  const openPrivacyPolicy = () => {
-    Linking.openURL('https://allesgut.app/datenschutz');
-  };
-
-  const openImprint = () => {
-    Linking.openURL('https://allesgut.app/impressum');
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Einstellungen</Text>
+        <Text style={[styles.title, { color: theme.text }]}>Einstellungen</Text>
       </View>
 
       <ScrollView
@@ -112,168 +106,109 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Section */}
-        <Text style={styles.sectionTitle}>PROFIL</Text>
-        <View style={styles.section}>
-          <Pressable style={styles.settingRow}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x1F464;</Text>
-            </View>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>Anzeigename</Text>
-              <Text style={styles.settingValue}>{user?.displayName}</Text>
-            </View>
-            <Text style={styles.chevron}>&#x203A;</Text>
-          </Pressable>
-        </View>
+        <ListSection title="Profil">
+          <ListRow
+            icon="person"
+            iconColor="#007AFF"
+            title="Anzeigename"
+            value={user?.displayName}
+            onPress={() => router.push('/(main)/edit-profile')}
+          />
+        </ListSection>
 
         {/* Check-in Section */}
-        <Text style={styles.sectionTitle}>CHECK-IN</Text>
-        <View style={styles.section}>
-          <Pressable style={styles.settingRow}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x23F1;</Text>
-            </View>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>Intervall</Text>
-              <Text style={styles.settingValue}>{currentInterval.label}</Text>
-            </View>
-            <Text style={styles.chevron}>&#x203A;</Text>
-          </Pressable>
-
-          <View style={styles.divider} />
-
-          <View style={styles.settingRowSwitch}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x23F8;</Text>
-            </View>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>Pausieren</Text>
-              <Text style={styles.settingSubtitle}>Für Urlaub/Reisen</Text>
-            </View>
-            <Switch
-              value={isPaused}
-              onValueChange={handleTogglePause}
-              trackColor={{ false: Colors.border, true: Colors.primaryLight }}
-              thumbColor={Colors.white}
-            />
-          </View>
-        </View>
-
-        {isPaused && (
-          <View style={styles.pauseWarning}>
-            <Text style={styles.pauseWarningText}>
-              &#x26A0; Check-in ist pausiert. Du erhältst keine Erinnerungen und deine Kontakte werden nicht benachrichtigt.
-            </Text>
-          </View>
-        )}
+        <ListSection
+          title="Check-in"
+          footer={
+            isPaused
+              ? '⚠️ Check-in ist pausiert. Du erhältst keine Erinnerungen und deine Kontakte werden nicht benachrichtigt.'
+              : undefined
+          }
+        >
+          <ListRow
+            icon="time"
+            iconColor="#FF9500"
+            title="Intervall"
+            value={currentInterval}
+            onPress={() => router.push('/(main)/edit-profile')}
+          />
+          <ListRow
+            icon="pause-circle"
+            iconColor="#8E8E93"
+            title="Pausieren"
+            subtitle="Für Urlaub oder Reisen"
+            switchValue={isPaused}
+            onSwitchChange={handleTogglePause}
+          />
+        </ListSection>
 
         {/* Notifications Section */}
-        <Text style={styles.sectionTitle}>BENACHRICHTIGUNGEN</Text>
-        <View style={styles.section}>
-          <View style={styles.settingRowSwitch}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x1F514;</Text>
-            </View>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>Erinnerungen</Text>
-            </View>
-            <Switch
-              value={reminderEnabled}
-              onValueChange={setReminderEnabled}
-              trackColor={{ false: Colors.border, true: Colors.primaryLight }}
-              thumbColor={Colors.white}
-            />
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.settingRowSwitch}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x1F4E7;</Text>
-            </View>
-            <View style={styles.settingInfo}>
-              <Text style={styles.settingLabel}>E-Mail-Backup</Text>
-            </View>
-            <Switch
-              value={emailBackupEnabled}
-              onValueChange={setEmailBackupEnabled}
-              trackColor={{ false: Colors.border, true: Colors.primaryLight }}
-              thumbColor={Colors.white}
-            />
-          </View>
-        </View>
+        <ListSection
+          title="Benachrichtigungen"
+          footer="Erinnerungen werden vor Ablauf der Check-in-Frist gesendet."
+        >
+          <ListRow
+            icon="notifications"
+            iconColor="#FF3B30"
+            title="Erinnerungen"
+            switchValue={reminderEnabled}
+            onSwitchChange={setReminderEnabled}
+          />
+        </ListSection>
 
         {/* Privacy Section */}
-        <Text style={styles.sectionTitle}>DATENSCHUTZ</Text>
-        <View style={styles.section}>
-          <Pressable style={styles.settingRow} onPress={openPrivacyPolicy}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x1F4C4;</Text>
-            </View>
-            <Text style={styles.settingLabel}>Datenschutzerklärung</Text>
-            <Text style={styles.chevron}>&#x203A;</Text>
-          </Pressable>
-
-          <View style={styles.divider} />
-
-          <Pressable style={styles.settingRow} onPress={handleExportData}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x1F4E5;</Text>
-            </View>
-            <Text style={styles.settingLabel}>Meine Daten exportieren</Text>
-            <Text style={styles.chevron}>&#x203A;</Text>
-          </Pressable>
-
-          <View style={styles.divider} />
-
-          <Pressable style={styles.settingRow} onPress={handleDeleteAccount}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x1F5D1;</Text>
-            </View>
-            <Text style={[styles.settingLabel, styles.dangerText]}>
-              Konto löschen
-            </Text>
-            <Text style={styles.chevron}>&#x203A;</Text>
-          </Pressable>
-        </View>
+        <ListSection title="Datenschutz">
+          <ListRow
+            icon="document-text"
+            iconColor="#5856D6"
+            title="Datenschutzerklärung"
+            onPress={() => Linking.openURL('https://allesgut.app/datenschutz')}
+          />
+          <ListRow
+            icon="download"
+            iconColor="#34C759"
+            title="Meine Daten exportieren"
+            onPress={handleExportData}
+          />
+          <ListRow
+            icon="trash"
+            iconColor="#FF3B30"
+            title="Konto löschen"
+            destructive
+            onPress={handleDeleteAccount}
+          />
+        </ListSection>
 
         {/* App Section */}
-        <Text style={styles.sectionTitle}>APP</Text>
-        <View style={styles.section}>
-          <Pressable style={styles.settingRow}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x2139;</Text>
-            </View>
-            <Text style={styles.settingLabel}>Über Alles Gut</Text>
-            <Text style={styles.chevron}>&#x203A;</Text>
-          </Pressable>
+        <ListSection title="App">
+          <ListRow
+            icon="information-circle"
+            iconColor="#007AFF"
+            title="Über Alles Gut"
+            onPress={() => router.push('/(main)/about')}
+          />
+          <ListRow
+            icon="document"
+            iconColor="#8E8E93"
+            title="Impressum"
+            onPress={() => Linking.openURL('https://allesgut.app/impressum')}
+          />
+        </ListSection>
 
-          <View style={styles.divider} />
-
-          <Pressable style={styles.settingRow} onPress={openImprint}>
-            <View style={styles.settingIcon}>
-              <Text style={styles.iconText}>&#x1F4DD;</Text>
-            </View>
-            <Text style={styles.settingLabel}>Impressum</Text>
-            <Text style={styles.chevron}>&#x203A;</Text>
-          </Pressable>
+        {/* Logout */}
+        <View style={styles.logoutContainer}>
+          <Button
+            title={isLoggingOut ? 'Wird abgemeldet...' : 'Abmelden'}
+            variant="secondary"
+            onPress={handleLogout}
+            disabled={isLoggingOut}
+            fullWidth
+          />
         </View>
 
-        {/* Logout Button */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.logoutButton,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={handleLogout}
-          disabled={isLoggingOut}
-        >
-          <Text style={styles.logoutText}>
-            {isLoggingOut ? 'Wird abgemeldet...' : 'Abmelden'}
-          </Text>
-        </Pressable>
-
-        <Text style={styles.version}>Version 1.0.0</Text>
+        <Text style={[styles.version, { color: theme.textSecondary }]}>
+          Version 1.0.0
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -282,7 +217,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   header: {
     paddingHorizontal: Spacing.lg,
@@ -292,109 +226,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.fontSize['3xl'],
     fontWeight: 'bold',
-    color: Colors.textPrimary,
   },
   content: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.xl,
+    paddingBottom: 120,
   },
-  sectionTitle: {
-    fontSize: Typography.fontSize.sm,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginTop: Spacing.lg,
-    marginBottom: Spacing.sm,
-    marginLeft: Spacing.sm,
-  },
-  section: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: Spacing.lg,
-    gap: Spacing.md,
-  },
-  settingRowSwitch: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: Spacing.lg,
-    gap: Spacing.md,
-  },
-  settingIcon: {
-    width: 32,
-    alignItems: 'center',
-  },
-  iconText: {
-    fontSize: 20,
-  },
-  settingInfo: {
-    flex: 1,
-  },
-  settingLabel: {
-    fontSize: Typography.fontSize.base,
-    color: Colors.textPrimary,
-  },
-  settingValue: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.textSecondary,
-    marginTop: Spacing.xs,
-  },
-  settingSubtitle: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.textSecondary,
-    marginTop: Spacing.xs,
-  },
-  chevron: {
-    fontSize: Typography.fontSize.xl,
-    color: Colors.textSecondary,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: Colors.border,
-    marginLeft: 56,
-  },
-  dangerText: {
-    color: Colors.danger,
-  },
-  pauseWarning: {
-    backgroundColor: Colors.warning + '20',
-    padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    marginTop: Spacing.sm,
-  },
-  pauseWarningText: {
-    fontSize: Typography.fontSize.sm,
-    color: Colors.warning,
-    lineHeight: Typography.lineHeight.sm,
-  },
-  logoutButton: {
-    backgroundColor: Colors.surface,
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.lg,
-    alignItems: 'center',
+  logoutContainer: {
     marginTop: Spacing.xl,
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  logoutText: {
-    fontSize: Typography.fontSize.base,
-    color: Colors.danger,
-    fontWeight: '500',
-  },
-  buttonPressed: {
-    opacity: 0.8,
   },
   version: {
     textAlign: 'center',
-    color: Colors.textSecondary,
     fontSize: Typography.fontSize.sm,
     marginTop: Spacing.lg,
     marginBottom: Spacing.xl,

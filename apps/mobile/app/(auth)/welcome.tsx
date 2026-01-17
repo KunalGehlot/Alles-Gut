@@ -1,52 +1,74 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/colors';
-import { Typography, Spacing } from '@/constants/typography';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Typography, Spacing, BorderRadius } from '@/constants/typography';
+import { Button } from '@/components';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.content}>
         <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Text style={styles.logoText}>AG</Text>
+          <View style={[styles.logoCircle, { backgroundColor: theme.primary }]}>
+            <Ionicons name="heart" size={48} color="#FFFFFF" />
           </View>
-          <Text style={styles.appName}>Alles Gut</Text>
-          <Text style={styles.tagline}>Dein digitales Lebenszeichen</Text>
+          <Text style={[styles.appName, { color: theme.text }]}>Alles Gut</Text>
+          <Text style={[styles.tagline, { color: theme.textSecondary }]}>
+            Dein digitales Lebenszeichen
+          </Text>
+        </View>
+
+        <View style={styles.featuresContainer}>
+          <View style={styles.featureRow}>
+            <View style={[styles.featureIcon, { backgroundColor: theme.surfaceSecondary }]}>
+              <Ionicons name="shield-checkmark" size={20} color={theme.primary} />
+            </View>
+            <Text style={[styles.featureText, { color: theme.text }]}>
+              Regelmäßige Check-ins für deine Sicherheit
+            </Text>
+          </View>
+          <View style={styles.featureRow}>
+            <View style={[styles.featureIcon, { backgroundColor: theme.surfaceSecondary }]}>
+              <Ionicons name="people" size={20} color={theme.primary} />
+            </View>
+            <Text style={[styles.featureText, { color: theme.text }]}>
+              Bis zu 5 Notfallkontakte
+            </Text>
+          </View>
+          <View style={styles.featureRow}>
+            <View style={[styles.featureIcon, { backgroundColor: theme.surfaceSecondary }]}>
+              <Ionicons name="lock-closed" size={20} color={theme.primary} />
+            </View>
+            <Text style={[styles.featureText, { color: theme.text }]}>
+              Ende-zu-Ende verschlüsselt
+            </Text>
+          </View>
         </View>
 
         <View style={styles.buttonContainer}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.primaryButton,
-              pressed && styles.buttonPressed,
-            ]}
+          <Button
+            title="Jetzt starten"
             onPress={() => router.push('/(auth)/register')}
-          >
-            <Text style={styles.primaryButtonText}>Jetzt starten</Text>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.secondaryButton,
-              pressed && styles.buttonPressed,
-            ]}
+            size="large"
+            fullWidth
+          />
+          <Button
+            title="Bereits registriert? Anmelden"
+            variant="ghost"
             onPress={() => router.push('/(auth)/register?mode=login')}
-          >
-            <Text style={styles.secondaryButtonText}>
-              Bereits registriert? Anmelden
-            </Text>
-          </Pressable>
+            fullWidth
+          />
         </View>
 
         <View style={styles.privacyContainer}>
-          <Text style={styles.privacyIcon}>&#x1F512;</Text>
-          <Text style={styles.privacyText}>Deine Daten bleiben privat</Text>
-          <Text style={styles.privacySubtext}>
-            DSGVO-konform · Ende-zu-Ende verschlüsselt
+          <Ionicons name="shield" size={18} color={theme.textSecondary} />
+          <Text style={[styles.privacyText, { color: theme.textSecondary }]}>
+            DSGVO-konform · Made in Germany
           </Text>
         </View>
       </View>
@@ -57,7 +79,6 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   content: {
     flex: 1,
@@ -71,69 +92,51 @@ const styles = StyleSheet.create({
     marginTop: Spacing['2xl'],
   },
   logoCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: Colors.primary,
+    width: 120,
+    height: 120,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: Spacing.lg,
   },
-  logoText: {
-    fontSize: Typography.fontSize['4xl'],
-    fontWeight: 'bold',
-    color: Colors.white,
-  },
   appName: {
     fontSize: Typography.fontSize['3xl'],
     fontWeight: 'bold',
-    color: Colors.textPrimary,
     marginBottom: Spacing.sm,
   },
   tagline: {
     fontSize: Typography.fontSize.lg,
-    color: Colors.textSecondary,
+  },
+  featuresContainer: {
+    gap: Spacing.md,
+    paddingHorizontal: Spacing.md,
+  },
+  featureRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  featureIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: BorderRadius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  featureText: {
+    fontSize: Typography.fontSize.base,
+    flex: 1,
   },
   buttonContainer: {
     gap: Spacing.md,
   },
-  primaryButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    color: Colors.white,
-    fontSize: Typography.fontSize.lg,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    paddingVertical: Spacing.md,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: Colors.primary,
-    fontSize: Typography.fontSize.base,
-  },
-  buttonPressed: {
-    opacity: 0.8,
-  },
   privacyContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  privacyIcon: {
-    fontSize: 24,
-    marginBottom: Spacing.xs,
+    justifyContent: 'center',
+    gap: Spacing.sm,
   },
   privacyText: {
-    fontSize: Typography.fontSize.base,
-    color: Colors.textSecondary,
-  },
-  privacySubtext: {
     fontSize: Typography.fontSize.sm,
-    color: Colors.textSecondary,
   },
 });

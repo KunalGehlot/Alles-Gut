@@ -3,13 +3,14 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthContext, useAuthProvider } from '@/hooks/useAuth';
-import { Colors } from '@/constants/colors';
+import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+function RootLayoutInner() {
   const auth = useAuthProvider();
+  const { theme, isDark } = useTheme();
 
   useEffect(() => {
     if (!auth.isLoading) {
@@ -23,11 +24,11 @@ export default function RootLayout() {
 
   return (
     <AuthContext.Provider value={auth}>
-      <StatusBar style="dark" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: Colors.background },
+          contentStyle: { backgroundColor: theme.background },
           animation: 'slide_from_right',
         }}
       >
@@ -35,5 +36,13 @@ export default function RootLayout() {
         <Stack.Screen name="(main)" options={{ headerShown: false }} />
       </Stack>
     </AuthContext.Provider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <RootLayoutInner />
+    </ThemeProvider>
   );
 }

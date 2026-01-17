@@ -1,25 +1,60 @@
 import { Tabs } from 'expo-router';
-import { Text, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/colors';
+import { StyleSheet, View, Platform } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Typography } from '@/constants/typography';
 
 export default function MainLayout() {
+  const { theme, isDark } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textSecondary,
-        tabBarStyle: styles.tabBar,
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textSecondary,
         tabBarLabelStyle: styles.tabBarLabel,
+        tabBarStyle: {
+          position: 'absolute',
+          borderTopWidth: 0,
+          elevation: 0,
+          height: Platform.OS === 'ios' ? 88 : 70,
+          paddingTop: 8,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
+          backgroundColor: 'transparent',
+        },
+        tabBarBackground: () => (
+          <View style={StyleSheet.absoluteFill}>
+            <BlurView
+              intensity={80}
+              tint={isDark ? 'dark' : 'light'}
+              style={StyleSheet.absoluteFill}
+            />
+            <View
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  backgroundColor: theme.tabBar,
+                  borderTopWidth: StyleSheet.hairlineWidth,
+                  borderTopColor: theme.tabBarBorder,
+                },
+              ]}
+            />
+          </View>
+        ),
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Start',
-          tabBarIcon: ({ color }) => (
-            <Text style={[styles.tabIcon, { color }]}>&#x1F3E0;</Text>
+          title: 'Home',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'home' : 'home-outline'}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -27,8 +62,12 @@ export default function MainLayout() {
         name="contacts"
         options={{
           title: 'Kontakte',
-          tabBarIcon: ({ color }) => (
-            <Text style={[styles.tabIcon, { color }]}>&#x1F465;</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'people' : 'people-outline'}
+              size={24}
+              color={color}
+            />
           ),
         }}
       />
@@ -36,9 +75,32 @@ export default function MainLayout() {
         name="settings"
         options={{
           title: 'Einstellungen',
-          tabBarIcon: ({ color }) => (
-            <Text style={[styles.tabIcon, { color }]}>&#x2699;</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'settings' : 'settings-outline'}
+              size={24}
+              color={color}
+            />
           ),
+        }}
+      />
+      {/* Hidden screens accessible via navigation */}
+      <Tabs.Screen
+        name="edit-profile"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="about"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="accept-invite"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
@@ -46,18 +108,8 @@ export default function MainLayout() {
 }
 
 const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: Colors.surface,
-    borderTopColor: Colors.border,
-    height: 85,
-    paddingTop: 8,
-    paddingBottom: 25,
-  },
   tabBarLabel: {
     fontSize: Typography.fontSize.xs,
     fontWeight: '500',
-  },
-  tabIcon: {
-    fontSize: 24,
   },
 });

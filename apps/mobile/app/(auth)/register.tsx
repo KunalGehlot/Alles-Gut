@@ -7,19 +7,21 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/colors';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components';
 
 type ContactType = 'email' | 'phone';
 type Step = 'select-method' | 'enter-contact';
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const { requestCode } = useAuth();
   const [step, setStep] = useState<Step>('select-method');
   const [contactType, setContactType] = useState<ContactType>('email');
@@ -65,20 +67,20 @@ export default function RegisterScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
         <View style={styles.header}>
           <Pressable onPress={handleBack} style={styles.backButton}>
-            <Text style={styles.backText}>&#x2190;</Text>
+            <Ionicons name="chevron-back" size={28} color={theme.primary} />
           </Pressable>
         </View>
 
         {step === 'select-method' ? (
           <View style={styles.content}>
-            <Text style={styles.title}>
+            <Text style={[styles.title, { color: theme.text }]}>
               Wie möchtest du dich registrieren?
             </Text>
 
@@ -86,43 +88,60 @@ export default function RegisterScreen() {
               <Pressable
                 style={({ pressed }) => [
                   styles.optionButton,
-                  pressed && styles.optionPressed,
+                  { backgroundColor: theme.surface, borderColor: theme.border },
+                  pressed && { borderColor: theme.primary },
                 ]}
                 onPress={() => handleSelectMethod('email')}
               >
-                <Text style={styles.optionIcon}>&#x2709;</Text>
-                <Text style={styles.optionText}>Mit E-Mail</Text>
+                <View style={[styles.optionIcon, { backgroundColor: theme.primary }]}>
+                  <Ionicons name="mail" size={24} color="#FFFFFF" />
+                </View>
+                <Text style={[styles.optionText, { color: theme.text }]}>
+                  Mit E-Mail
+                </Text>
+                <Ionicons name="chevron-forward" size={20} color={theme.textTertiary} />
               </Pressable>
 
               <Pressable
-                style={({ pressed }) => [
+                style={[
                   styles.optionButton,
-                  styles.optionDisabled,
+                  { backgroundColor: theme.surface, borderColor: theme.border, opacity: 0.5 },
                 ]}
                 disabled
               >
-                <Text style={styles.optionIcon}>&#x1F4F1;</Text>
-                <Text style={styles.optionTextDisabled}>
-                  Mit Handynummer (bald verfügbar)
+                <View style={[styles.optionIcon, { backgroundColor: theme.textSecondary }]}>
+                  <Ionicons name="phone-portrait" size={24} color="#FFFFFF" />
+                </View>
+                <Text style={[styles.optionText, { color: theme.textSecondary }]}>
+                  Mit Handynummer (bald)
                 </Text>
               </Pressable>
             </View>
 
-            <View style={styles.infoBox}>
-              <Text style={styles.infoIcon}>&#x2139;</Text>
-              <Text style={styles.infoText}>
+            <View style={[styles.infoBox, { backgroundColor: theme.surfaceSecondary }]}>
+              <Ionicons name="information-circle" size={20} color={theme.textSecondary} />
+              <Text style={[styles.infoText, { color: theme.textSecondary }]}>
                 Wir senden dir einen Bestätigungscode. Kein Passwort nötig.
               </Text>
             </View>
           </View>
         ) : (
           <View style={styles.content}>
-            <Text style={styles.title}>Deine E-Mail-Adresse</Text>
+            <Text style={[styles.title, { color: theme.text }]}>
+              Deine E-Mail-Adresse
+            </Text>
 
             <TextInput
-              style={[styles.input, error && styles.inputError]}
+              style={[
+                styles.input,
+                {
+                  backgroundColor: theme.surface,
+                  borderColor: error ? theme.danger : theme.border,
+                  color: theme.text,
+                },
+              ]}
               placeholder="max.mustermann@email.de"
-              placeholderTextColor={Colors.textSecondary}
+              placeholderTextColor={theme.textTertiary}
               value={contactInfo}
               onChangeText={(text) => {
                 setContactInfo(text);
@@ -134,27 +153,22 @@ export default function RegisterScreen() {
               autoFocus
             />
 
-            {error && <Text style={styles.errorText}>{error}</Text>}
+            {error && (
+              <Text style={[styles.errorText, { color: theme.danger }]}>{error}</Text>
+            )}
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.primaryButton,
-                pressed && styles.buttonPressed,
-                isLoading && styles.buttonDisabled,
-              ]}
+            <Button
+              title={isLoading ? 'Wird gesendet...' : 'Code anfordern'}
               onPress={handleRequestCode}
               disabled={isLoading}
-            >
-              {isLoading ? (
-                <ActivityIndicator color={Colors.white} />
-              ) : (
-                <Text style={styles.primaryButtonText}>Code anfordern</Text>
-              )}
-            </Pressable>
+              loading={isLoading}
+              fullWidth
+              size="large"
+            />
 
-            <View style={styles.privacyNote}>
-              <Text style={styles.privacyIcon}>&#x1F512;</Text>
-              <Text style={styles.privacyText}>
+            <View style={[styles.privacyNote, { backgroundColor: theme.surfaceSecondary }]}>
+              <Ionicons name="lock-closed" size={18} color={theme.textSecondary} />
+              <Text style={[styles.privacyText, { color: theme.textSecondary }]}>
                 Deine E-Mail wird verschlüsselt gespeichert und nur für die
                 Anmeldung und Notfall-Benachrichtigungen verwendet.
               </Text>
@@ -169,31 +183,25 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   keyboardView: {
     flex: 1,
   },
   header: {
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.sm,
   },
   backButton: {
     padding: Spacing.sm,
   },
-  backText: {
-    fontSize: Typography.fontSize['2xl'],
-    color: Colors.textPrimary,
-  },
   content: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xl,
+    paddingTop: Spacing.lg,
   },
   title: {
     fontSize: Typography.fontSize['2xl'],
     fontWeight: '600',
-    color: Colors.textPrimary,
     marginBottom: Spacing.xl,
   },
   optionsContainer: {
@@ -202,103 +210,61 @@ const styles = StyleSheet.create({
   optionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
     paddingVertical: Spacing.lg,
     paddingHorizontal: Spacing.lg,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
     gap: Spacing.md,
   },
-  optionPressed: {
-    backgroundColor: Colors.background,
-    borderColor: Colors.primary,
-  },
-  optionDisabled: {
-    opacity: 0.5,
-  },
   optionIcon: {
-    fontSize: 24,
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   optionText: {
+    flex: 1,
     fontSize: Typography.fontSize.lg,
-    color: Colors.textPrimary,
     fontWeight: '500',
-  },
-  optionTextDisabled: {
-    fontSize: Typography.fontSize.lg,
-    color: Colors.textSecondary,
   },
   infoBox: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginTop: Spacing.xl,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
     gap: Spacing.sm,
-  },
-  infoIcon: {
-    fontSize: Typography.fontSize.lg,
-    color: Colors.textSecondary,
   },
   infoText: {
     flex: 1,
     fontSize: Typography.fontSize.base,
-    color: Colors.textSecondary,
-    lineHeight: Typography.lineHeight.base,
+    lineHeight: Typography.lineHeight.base * 1.4,
   },
   input: {
-    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
     borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md,
+    paddingVertical: Spacing.lg,
     paddingHorizontal: Spacing.lg,
     fontSize: Typography.fontSize.lg,
-    color: Colors.textPrimary,
     marginBottom: Spacing.lg,
   },
-  inputError: {
-    borderColor: Colors.danger,
-  },
   errorText: {
-    color: Colors.danger,
     fontSize: Typography.fontSize.sm,
     marginTop: -Spacing.sm,
     marginBottom: Spacing.md,
-  },
-  primaryButton: {
-    backgroundColor: Colors.primary,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: BorderRadius.lg,
-    alignItems: 'center',
-    marginBottom: Spacing.xl,
-  },
-  primaryButtonText: {
-    color: Colors.white,
-    fontSize: Typography.fontSize.lg,
-    fontWeight: '600',
-  },
-  buttonPressed: {
-    opacity: 0.8,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
   },
   privacyNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: Spacing.sm,
-    backgroundColor: Colors.surface,
     padding: Spacing.md,
     borderRadius: BorderRadius.lg,
-  },
-  privacyIcon: {
-    fontSize: Typography.fontSize.lg,
+    marginTop: Spacing.xl,
   },
   privacyText: {
     flex: 1,
     fontSize: Typography.fontSize.sm,
-    color: Colors.textSecondary,
-    lineHeight: Typography.lineHeight.sm,
+    lineHeight: Typography.lineHeight.sm * 1.4,
   },
 });
