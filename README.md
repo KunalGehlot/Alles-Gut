@@ -705,6 +705,32 @@ npx expo start --port 8082
 3. Create or start a virtual device
 4. Verify with `adb devices`
 
+#### iOS build fails with "No such file or directory" for paths with spaces
+**Cause:** The project path contains spaces (e.g., "Alles Gut" instead of "Alles-Gut"). Some build scripts don't properly quote paths, causing shell errors.
+
+**Solution:**
+Either rename the project folder to remove spaces, or apply these two fixes:
+
+1. **Fix EXConstants script** - Edit `node_modules/expo-constants/ios/EXConstants.podspec`:
+```diff
+-    :script => "bash -l -c \"#{env_vars}$PODS_TARGET_SRCROOT/../scripts/get-app-config-ios.sh\"",
++    :script => "bash -l -c \"#{env_vars}\\\"$PODS_TARGET_SRCROOT/../scripts/get-app-config-ios.sh\\\"\"",
+```
+Then run `pod install` in the `ios` directory.
+
+2. **Fix React Native bundling script** - Edit `apps/mobile/ios/AllesGut.xcodeproj/project.pbxproj`:
+Find the "Bundle React Native code and images" shell script and change the last line from:
+```bash
+`"$NODE_BINARY" --print "require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'"`
+```
+to:
+```bash
+RN_SCRIPT="$("$NODE_BINARY" --print "require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'")"
+"$RN_SCRIPT"
+```
+
+> **Note:** The `node_modules` fix is temporary and will be lost on reinstall. Consider using `patch-package` to persist it, or rename the project folder to avoid spaces.
+
 #### API can't connect to PostgreSQL
 **Solution:**
 ```bash
