@@ -38,7 +38,8 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
+    isRetry = false
   ): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
     const headers = await this.getHeaders();
@@ -51,8 +52,21 @@ class ApiClient {
       },
     });
 
+    // Handle 401 Unauthorized - try to refresh token once
+    if (response.status === 401 && !isRetry && !endpoint.includes('/auth/')) {
+      const refreshed = await this.refreshToken();
+      if (refreshed) {
+        return this.request<T>(endpoint, options, true);
+      }
+    }
+
     if (!response.ok) {
-      const error: ApiError = await response.json();
+      let error: ApiError;
+      try {
+        error = await response.json();
+      } catch {
+        error = { error: 'Error', message: 'An error occurred', statusCode: response.status };
+      }
       throw new Error(error.message || 'An error occurred');
     }
 

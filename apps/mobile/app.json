@@ -28,7 +28,13 @@
         "backgroundColor": "#2D7D46"
       },
       "package": "app.allesgut.mobile",
-      "permissions": ["CAMERA", "VIBRATE", "RECEIVE_BOOT_COMPLETED"]
+      "permissions": [
+        "CAMERA",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "android.permission.ACCESS_NOTIFICATION_POLICY",
+        "android.permission.POST_NOTIFICATIONS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -42,7 +48,14 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#2D7D46"
+          "color": "#2D7D46",
+          "sounds": ["./assets/sounds/alert.wav"],
+          "defaultChannel": {
+            "name": "default",
+            "importance": 4,
+            "vibrationPattern": [0, 250, 250, 250],
+            "lightColor": "#FF2D7D46"
+          }
         }
       ],
       [

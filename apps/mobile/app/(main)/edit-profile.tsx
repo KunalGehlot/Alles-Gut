@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -34,10 +34,20 @@ export default function EditProfileScreen() {
     user?.checkInIntervalHours ?? 48
   );
   const [isSaving, setIsSaving] = useState(false);
+  const [initialLoaded, setInitialLoaded] = useState(false);
+
+  // Sync state when user data becomes available or changes
+  useEffect(() => {
+    if (user && !initialLoaded) {
+      setDisplayName(user.displayName ?? '');
+      setSelectedInterval(user.checkInIntervalHours ?? 48);
+      setInitialLoaded(true);
+    }
+  }, [user, initialLoaded]);
 
   const hasChanges =
-    displayName !== user?.displayName ||
-    selectedInterval !== user?.checkInIntervalHours;
+    displayName !== (user?.displayName ?? '') ||
+    selectedInterval !== (user?.checkInIntervalHours ?? 48);
 
   const isValid = displayName.trim().length >= 2;
 

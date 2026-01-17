@@ -2,6 +2,10 @@ import Expo, { ExpoPushMessage, ExpoPushTicket } from 'expo-server-sdk';
 
 const expo = new Expo();
 
+// Android notification channel IDs (must match mobile app)
+const CRITICAL_CHANNEL_ID = 'emergency-alerts';
+const DEFAULT_CHANNEL_ID = 'default';
+
 interface SendPushNotificationParams {
   pushToken: string;
   title: string;
@@ -63,10 +67,11 @@ export async function sendAlertNotifications({
     .filter(token => Expo.isExpoPushToken(token))
     .map(token => ({
       to: token,
-      sound: 'default',
-      title: 'Wichtige Mitteilung',
+      sound: 'alert.wav', // Custom alert sound
+      title: '🚨 NOTFALL - Lebenszeichen fehlt',
       body: `${userName} hat sich seit ${hoursSinceCheckIn} Stunden nicht gemeldet. Bitte prüfe, ob alles in Ordnung ist.`,
       priority: 'high' as const,
+      channelId: CRITICAL_CHANNEL_ID, // Android critical alerts channel
       data: {
         type: 'alert',
         userName,

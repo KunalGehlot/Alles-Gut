@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, Linking, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotifications } from '@/hooks/useNotifications';
 import { api } from '@/services/api';
 import { ListSection, ListRow, Button } from '@/components';
 
@@ -19,9 +20,10 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { theme } = useTheme();
   const { user, logout, refreshUser } = useAuth();
+  const { isEnabled: notificationsEnabled, isDndBypassed, registerNotifications, requestDndBypass } = useNotifications();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isPaused, setIsPaused] = useState(user?.isPaused ?? false);
-  const [reminderEnabled, setReminderEnabled] = useState(true);
+  const [reminderEnabled, setReminderEnabled] = useState(user?.reminderEnabled ?? true);
 
   const currentInterval = CHECK_IN_INTERVALS[user?.checkInIntervalHours ?? 48];
 
@@ -32,6 +34,17 @@ export default function SettingsScreen() {
       await refreshUser();
     } catch {
       setIsPaused(!value);
+      Alert.alert('Fehler', 'Einstellung konnte nicht gespeichert werden.');
+    }
+  };
+
+  const handleToggleReminder = async (value: boolean) => {
+    setReminderEnabled(value);
+    try {
+      await api.updateProfile({ reminderEnabled: value });
+      await refreshUser();
+    } catch {
+      setReminderEnabled(!value);
       Alert.alert('Fehler', 'Einstellung konnte nicht gespeichert werden.');
     }
   };
@@ -72,7 +85,8 @@ export default function SettingsScreen() {
           onPress: async () => {
             try {
               await api.deleteAccount();
-              router.replace('/');
+              await logout();
+              router.replace('/(auth)/welcome');
             } catch {
               Alert.alert('Fehler', 'Konto konnte nicht gelöscht werden.');
             }
@@ -86,10 +100,10 @@ export default function SettingsScreen() {
     setIsLoggingOut(true);
     try {
       await logout();
-      router.replace('/');
+      // Navigate directly to welcome screen to avoid redirect race condition
+      router.replace('/(auth)/welcome');
     } catch {
       Alert.alert('Fehler', 'Abmeldung fehlgeschlagen.');
-    } finally {
       setIsLoggingOut(false);
     }
   };
@@ -145,12 +159,48 @@ export default function SettingsScreen() {
         {/* Notifications Section */}
         <ListSection
           title="Benachrichtigungen"
-          footer="Erinnerungen werden vor Ablauf der Check-in-Frist gesendet."
+          footer={
+            !notificationsEnabled
+              ? '⚠️ Benachrichtigungen sind deaktiviert. Aktiviere sie in den Einstellungen, um Notfall-Benachrichtigungen zu erhalten.'
+              : Platform.OS === 'android' && !isDndBypassed
+              ? '⚠️ Kritische Benachrichtigungen können "Nicht stören" nicht umgehen. Aktiviere diese Berechtigung für maximale Zuverlässigkeit.'
+              : 'Benachrichtigungen sind aktiviert. Du wirst bei Notfällen benachrichtigt.'
+          }
         >
           <ListRow
             icon="notifications"
-            iconColor="#FF3B30"
+            iconColor={notificationsEnabled ? '#34C759' : '#FF3B30'}
+            title="Push-Benachrichtigungen"
+            value={notificationsEnabled ? 'Aktiviert' : 'Deaktiviert'}
+            onPress={() => {
+              if (!notificationsEnabled) {
+                registerNotifications();
+              } else {
+                Linking.openSettings();
+              }
+            }}
+          />
+          {Platform.OS === 'android' && (
+            <ListRow
+              icon="volume-high"
+              iconColor={isDndBypassed ? '#34C759' : '#FF9500'}
+              title="Kritische Benachrichtigungen"
+              subtitle='"Nicht stören" umgehen'
+              value={isDndBypassed ? 'Aktiviert' : 'Deaktiviert'}
+              onPress={() => {
+                if (!isDndBypassed) {
+                  requestDndBypass();
+                } else {
+                  Linking.openSettings();
+                }
+              }}
+            />
+          )}
+          <ListRow
+            icon="alarm"
+            iconColor="#FF9500"
             title="Erinnerungen"
+            subtitle="Vor Ablauf der Check-in-Frist"
             switchValue={reminderEnabled}
             onSwitchChange={setReminderEnabled}
           />

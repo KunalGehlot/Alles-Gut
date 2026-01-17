@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthContext, useAuthProvider } from '@/hooks/useAuth';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { registerForPushNotifications, setupNotificationChannels } from '@/services/notifications';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -17,6 +18,17 @@ function RootLayoutInner() {
       SplashScreen.hideAsync();
     }
   }, [auth.isLoading]);
+
+  // Register for push notifications when user is authenticated
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      // Set up notification channels first
+      setupNotificationChannels().then(() => {
+        // Then register for push notifications
+        registerForPushNotifications().catch(console.error);
+      });
+    }
+  }, [auth.isAuthenticated]);
 
   if (auth.isLoading) {
     return null;

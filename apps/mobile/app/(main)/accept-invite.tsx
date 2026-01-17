@@ -42,7 +42,7 @@ export default function AcceptInviteScreen() {
 
     setIsProcessing(true);
     try {
-      await api.acceptInvitation(code.trim());
+      await api.acceptInvitation({ inviteCode: code.trim() });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(
         'Einladung angenommen',

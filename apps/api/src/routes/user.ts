@@ -12,6 +12,7 @@ const updateUserSchema = z.object({
   displayName: z.string().min(2).max(50).optional(),
   checkInIntervalHours: z.number().int().positive().optional(),
   isPaused: z.boolean().optional(),
+  reminderEnabled: z.boolean().optional(),
 });
 
 // GET /user/me
@@ -26,11 +27,12 @@ router.get('/me', async (req: Request, res: Response) => {
       check_in_interval_hours: number;
       grace_period_hours: number;
       is_paused: boolean;
+      reminder_enabled: boolean;
       last_check_in: Date | null;
       next_deadline: Date | null;
     }>(
       `SELECT id, encrypted_display_name, contact_type, check_in_interval_hours,
-              grace_period_hours, is_paused, last_check_in, next_deadline
+              grace_period_hours, is_paused, reminder_enabled, last_check_in, next_deadline
        FROM users WHERE id = $1`,
       [userId]
     );
@@ -50,6 +52,7 @@ router.get('/me', async (req: Request, res: Response) => {
       checkInIntervalHours: user.check_in_interval_hours,
       gracePeriodHours: user.grace_period_hours,
       isPaused: user.is_paused,
+      reminderEnabled: user.reminder_enabled,
       lastCheckIn: user.last_check_in?.toISOString() ?? null,
       nextDeadline: user.next_deadline?.toISOString() ?? null,
     });
@@ -101,6 +104,11 @@ router.patch('/me', async (req: Request, res: Response) => {
       values.push(updates.isPaused);
     }
 
+    if (updates.reminderEnabled !== undefined) {
+      setClauses.push(`reminder_enabled = $${paramIndex++}`);
+      values.push(updates.reminderEnabled);
+    }
+
     if (setClauses.length === 0) {
       res.status(400).json({ error: 'Bad Request', message: 'No valid fields to update' });
       return;
@@ -121,11 +129,12 @@ router.patch('/me', async (req: Request, res: Response) => {
       check_in_interval_hours: number;
       grace_period_hours: number;
       is_paused: boolean;
+      reminder_enabled: boolean;
       last_check_in: Date | null;
       next_deadline: Date | null;
     }>(
       `SELECT id, encrypted_display_name, contact_type, check_in_interval_hours,
-              grace_period_hours, is_paused, last_check_in, next_deadline
+              grace_period_hours, is_paused, reminder_enabled, last_check_in, next_deadline
        FROM users WHERE id = $1`,
       [userId]
     );
@@ -140,6 +149,7 @@ router.patch('/me', async (req: Request, res: Response) => {
       checkInIntervalHours: user.check_in_interval_hours,
       gracePeriodHours: user.grace_period_hours,
       isPaused: user.is_paused,
+      reminderEnabled: user.reminder_enabled,
       lastCheckIn: user.last_check_in?.toISOString() ?? null,
       nextDeadline: user.next_deadline?.toISOString() ?? null,
     });

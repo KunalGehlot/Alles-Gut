@@ -7,6 +7,7 @@ export interface User {
   checkInIntervalHours: number;
   gracePeriodHours: number;
   isPaused: boolean;
+  reminderEnabled: boolean;
   lastCheckIn: string | null;
   nextDeadline: string | null;
   createdAt: string;
@@ -20,6 +21,7 @@ export interface UserProfile {
   checkInIntervalHours: number;
   gracePeriodHours: number;
   isPaused: boolean;
+  reminderEnabled: boolean;
   lastCheckIn: string | null;
   nextDeadline: string | null;
 }
@@ -96,6 +98,7 @@ export interface UpdateUserRequest {
   displayName?: string;
   checkInIntervalHours?: number;
   isPaused?: boolean;
+  reminderEnabled?: boolean;
 }
 
 export interface CreateInvitationResponse {

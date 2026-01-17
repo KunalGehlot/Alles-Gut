@@ -18,7 +18,8 @@
       "Bash(npm run mobile:*)",
       "Bash(kill:*)",
       "Bash(lsof:*)",
-      "Bash(xargs kill:*)"
+      "Bash(xargs kill:*)",
+      "Bash(cd:*)"
     ]
   }
 }

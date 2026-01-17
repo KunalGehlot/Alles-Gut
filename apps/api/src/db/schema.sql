@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     grace_period_hours INTEGER DEFAULT 6 CHECK (grace_period_hours >= 0),
     expo_push_token TEXT,
     is_paused BOOLEAN DEFAULT FALSE,
+    reminder_enabled BOOLEAN DEFAULT TRUE,
     last_check_in TIMESTAMP WITH TIME ZONE,
     next_deadline TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

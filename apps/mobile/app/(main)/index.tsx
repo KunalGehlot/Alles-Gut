@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Pressable,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
@@ -27,7 +28,7 @@ const WARNING_THRESHOLD_HOURS = 6;
 export default function HomeScreen() {
   const { theme } = useTheme();
   const { user } = useAuth();
-  const { status, isLoading, isCheckingIn, checkIn, refreshStatus } = useCheckIn();
+  const { status, isLoading, isCheckingIn, checkIn, refreshStatus, error: checkInError } = useCheckIn();
   const { contacts } = useContacts();
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -60,8 +61,12 @@ export default function HomeScreen() {
         successOpacity.value = withSpring(0);
         setTimeout(() => setShowSuccess(false), 300);
       }, 3000);
-    } catch {
+    } catch (error) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(
+        'Fehler',
+        error instanceof Error ? error.message : 'Check-in fehlgeschlagen. Bitte versuche es erneut.'
+      );
     }
   };
 
@@ -82,6 +87,29 @@ export default function HomeScreen() {
       <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Show error state with retry option
+  if (checkInError && !status) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+        <View style={styles.loadingContainer}>
+          <Ionicons name="warning-outline" size={48} color={theme.danger} />
+          <Text style={[styles.greeting, { color: theme.text, marginTop: 16 }]}>
+            Verbindungsfehler
+          </Text>
+          <Text style={[styles.lastCheckIn, { color: theme.textSecondary, textAlign: 'center', marginHorizontal: 32 }]}>
+            {checkInError}
+          </Text>
+          <Pressable
+            style={[styles.retryButton, { backgroundColor: theme.primary }]}
+            onPress={refreshStatus}
+          >
+            <Text style={styles.retryButtonText}>Erneut versuchen</Text>
+          </Pressable>
         </View>
       </SafeAreaView>
     );
@@ -346,5 +374,16 @@ const styles = StyleSheet.create({
   },
   contactsText: {
     fontSize: Typography.fontSize.base,
+  },
+  retryButton: {
+    marginTop: Spacing.xl,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xl,
+    borderRadius: BorderRadius.lg,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontSize: Typography.fontSize.base,
+    fontWeight: '600',
   },
 });
