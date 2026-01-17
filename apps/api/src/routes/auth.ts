@@ -115,47 +115,21 @@ router.post('/verify', async (req: Request, res: Response) => {
     // Delete the used code
     await db.query('DELETE FROM verification_codes WHERE id = $1', [codeResult.rows[0].id]);
 
-    // Check if user exists
-    let user = await db.query<{ id: string }>(
-      `SELECT id FROM users
-       WHERE encrypted_contact_info IS NOT NULL`,
-      []
-    );
-
-    // We need to check by decrypting or use a hash
-    // For simplicity, let's use the contact hash approach
-    const existingUser = await db.query<{ id: string }>(
-      `SELECT u.id FROM users u
-       WHERE EXISTS (
-         SELECT 1 FROM verification_codes vc
-         WHERE vc.contact_info_hash = $1
-       )`,
+    // Check if user exists using blind index (fast O(1) lookup)
+    const userResult = await db.query<{ id: string }>(
+      'SELECT id FROM users WHERE contact_info_hash = $1',
       [contactHash]
-    );
-
-    // Actually, let's store a contact hash in the users table for lookup
-    // For now, search through users (in production, add a contact_hash column)
-    const allUsers = await db.query<{ id: string; encrypted_contact_info: Buffer }>(
-      'SELECT id, encrypted_contact_info FROM users'
     );
 
     let userId: string | null = null;
     let isNewUser = true;
 
-    for (const u of allUsers.rows) {
-      try {
-        const { decrypt } = await import('../services/encryption.js');
-        const decryptedContact = decrypt(u.encrypted_contact_info, u.id);
-        if (hashContactInfo(decryptedContact) === contactHash) {
-          userId = u.id;
-          isNewUser = false;
-          break;
-        }
-      } catch {
-        // Decryption failed, skip this user
-        continue;
-      }
+    if (userResult.rows.length > 0) {
+      userId = userResult.rows[0].id;
+      isNewUser = false;
     }
+
+
 
     if (!userId) {
       // Create new user
@@ -166,9 +140,9 @@ router.post('/verify', async (req: Request, res: Response) => {
       const encryptedDisplayName = encrypt('Nutzer', userId); // Default name
 
       await db.query(
-        `INSERT INTO users (id, encrypted_display_name, encrypted_contact_info, contact_type)
-         VALUES ($1, $2, $3, $4)`,
-        [userId, encryptedDisplayName, encryptedContactInfo, 'email']
+        `INSERT INTO users (id, encrypted_display_name, encrypted_contact_info, contact_info_hash, contact_type)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [userId, encryptedDisplayName, encryptedContactInfo, contactHash, 'email']
       );
     }
 
@@ -186,7 +160,7 @@ router.post('/verify', async (req: Request, res: Response) => {
     );
 
     // Get user profile
-    const userResult = await db.query<{
+    const profileResult = await db.query<{
       id: string;
       encrypted_display_name: Buffer;
       contact_type: string;
@@ -202,7 +176,7 @@ router.post('/verify', async (req: Request, res: Response) => {
       [userId]
     );
 
-    const userData = userResult.rows[0];
+    const userData = profileResult.rows[0];
     const { decrypt } = await import('../services/encryption.js');
     const displayName = decrypt(userData.encrypted_display_name, userId);
 

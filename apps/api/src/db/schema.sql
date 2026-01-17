@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     encrypted_display_name BYTEA NOT NULL,
     encrypted_contact_info BYTEA NOT NULL,
+    contact_info_hash TEXT,
     contact_type VARCHAR(10) NOT NULL CHECK (contact_type IN ('email', 'phone')),
     check_in_interval_hours INTEGER DEFAULT 48 CHECK (check_in_interval_hours > 0),
     grace_period_hours INTEGER DEFAULT 6 CHECK (grace_period_hours >= 0),
@@ -78,6 +79,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_users_next_deadline ON users(next_deadline) WHERE NOT is_paused;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_contact_info_hash ON users(contact_info_hash);
 CREATE INDEX IF NOT EXISTS idx_contacts_user_id ON contacts(user_id);
 CREATE INDEX IF NOT EXISTS idx_contacts_contact_user_id ON contacts(contact_user_id);
 CREATE INDEX IF NOT EXISTS idx_check_ins_user_id ON check_ins(user_id);

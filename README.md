@@ -750,6 +750,16 @@ Then rebuild the app with `npx expo run:ios`.
 ```
 If you have existing corrupted users in your database, you may need to delete them and re-register.
 
+#### "expo-linking needs access to the expo-constants manifest"
+**Cause:** (Spaces in path) `expo-constants` has a helper script `get-app-config-ios.sh` that fails to quote the `$PROJECT_DIR` variable. If your project path has spaces, it thinks it's not running in the correct Pods directory and exits silently, failing to generate the config.
+**Solution:**
+Edit `node_modules/expo-constants/scripts/get-app-config-ios.sh` and fix line 14:
+```diff
+- PROJECT_DIR_BASENAME=$(basename $PROJECT_DIR)
++ PROJECT_DIR_BASENAME=$(basename "$PROJECT_DIR")
+```
+This ensures the directory name is correctly resolved even with spaces. Rebuild with `npx expo run:ios`.
+
 #### API can't connect to PostgreSQL
 **Solution:**
 ```bash

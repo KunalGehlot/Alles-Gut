@@ -54,8 +54,9 @@ export function decrypt(encryptedData: Buffer, userId: string): string {
 }
 
 export function hashContactInfo(contactInfo: string): string {
+  const masterKey = getMasterKey();
   return crypto
-    .createHash('sha256')
+    .createHmac('sha256', masterKey)
     .update(contactInfo.toLowerCase().trim())
     .digest('hex');
 }
