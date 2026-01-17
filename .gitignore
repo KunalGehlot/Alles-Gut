@@ -58,3 +58,4 @@ coverage/
 # Misc
 *.pem
 .cache/
+apps/api/.env.example

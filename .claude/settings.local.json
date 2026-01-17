@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(npm install:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(psql:*)",
+      "Bash(brew install:*)",
+      "Bash(brew services start:*)",
+      "Bash(/opt/homebrew/opt/postgresql@16/bin/psql:*)"
     ]
   }
 }
