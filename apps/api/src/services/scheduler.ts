@@ -47,7 +47,7 @@ async function checkMissedDeadlines(): Promise<void> {
     SELECT id, encrypted_display_name, last_check_in, next_deadline
     FROM users
     WHERE next_deadline < NOW()
-      AND is_paused = FALSE
+      AND (is_paused = FALSE OR (paused_until IS NOT NULL AND paused_until < NOW()))
       AND id NOT IN (
         SELECT user_id FROM alerts
         WHERE triggered_at > NOW() - INTERVAL '1 hour'

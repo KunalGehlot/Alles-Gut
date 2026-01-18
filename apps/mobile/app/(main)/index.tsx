@@ -64,7 +64,7 @@ export default function HomeScreen() {
   }, [isPaused, showSuccess]);
 
   const handleCheckIn = async () => {
-    if (isPaused) return;
+    // if (isPaused) return; // Allow check-in to unpause/verify
 
     try {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -142,7 +142,7 @@ export default function HomeScreen() {
   }
 
   const buttonColor = isPaused
-    ? theme.textTertiary
+    ? theme.primary // Allow interaction
     : isWarning
       ? theme.warning
       : theme.primary;
@@ -221,7 +221,7 @@ export default function HomeScreen() {
                 <Pressable
                   style={[styles.checkInButton, { backgroundColor: buttonColor }]}
                   onPress={handleCheckIn}
-                  disabled={isCheckingIn || isPaused}
+                  disabled={isCheckingIn} // Enable even if paused
                 >
                   {isCheckingIn ? (
                     <ActivityIndicator size="large" color="#FFFFFF" />
@@ -229,13 +229,13 @@ export default function HomeScreen() {
                     <>
                       <View style={[styles.checkmarkCircle, { borderColor: theme.background }]}>
                         <Ionicons
-                          name={isPaused ? 'pause' : 'checkmark'}
+                          name={'checkmark'}
                           size={64}
                           color={theme.background}
                         />
                       </View>
                       <Text style={styles.buttonText}>
-                        {isPaused ? 'PAUSIERT' : 'ALLES GUT'}
+                        {isPaused ? 'ALLES GUT' : 'ALLES GUT'}
                       </Text>
                     </>
                   )}

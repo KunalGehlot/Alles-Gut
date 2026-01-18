@@ -27,12 +27,13 @@ router.get('/me', async (req: Request, res: Response) => {
       check_in_interval_hours: number;
       grace_period_hours: number;
       is_paused: boolean;
+      paused_until: Date | null;
       reminder_enabled: boolean;
       last_check_in: Date | null;
       next_deadline: Date | null;
     }>(
       `SELECT id, encrypted_display_name, contact_type, check_in_interval_hours,
-              grace_period_hours, is_paused, reminder_enabled, last_check_in, next_deadline
+              grace_period_hours, is_paused, paused_until, reminder_enabled, last_check_in, next_deadline
        FROM users WHERE id = $1`,
       [userId]
     );
@@ -52,6 +53,7 @@ router.get('/me', async (req: Request, res: Response) => {
       checkInIntervalHours: user.check_in_interval_hours,
       gracePeriodHours: user.grace_period_hours,
       isPaused: user.is_paused,
+      pausedUntil: user.paused_until ? user.paused_until.toISOString() : null,
       reminderEnabled: user.reminder_enabled,
       lastCheckIn: user.last_check_in?.toISOString() ?? null,
       nextDeadline: user.next_deadline?.toISOString() ?? null,
@@ -103,8 +105,39 @@ router.patch('/me', async (req: Request, res: Response) => {
       setClauses.push(`is_paused = $${paramIndex++}`);
       values.push(updates.isPaused);
 
-      // If unpausing, reset the deadline
-      if (updates.isPaused === false) {
+      if (updates.isPaused === true) {
+        // Pause logic: pause for exactly 24 hours
+        const now = new Date();
+        const [currentState] = await db.query(
+          'SELECT is_paused, paused_until, next_deadline FROM users WHERE id = $1',
+          [userId]
+        ).then(r => r.rows);
+
+        // Prevent extending pause if already paused
+        if (currentState.is_paused && currentState.paused_until && new Date(currentState.paused_until) > new Date()) {
+          res.status(400).json({ error: 'Bad Request', message: 'Pause is already active' });
+          return;
+        }
+
+        // Prevent pausing if overdue (deadline passed and not currently paused)
+        if (!currentState.is_paused && currentState.next_deadline && new Date(currentState.next_deadline) < now) {
+          res.status(400).json({ error: 'Bad Request', message: 'Cannot pause when check-in is overdue' });
+          return;
+        }
+
+        const resumeAt = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
+
+        setClauses.push(`paused_until = $${paramIndex++}`);
+        values.push(resumeAt);
+
+        // Set next_deadline to the resume time so they are checked immediately after
+        setClauses.push(`next_deadline = $${paramIndex++}`);
+        values.push(resumeAt);
+      } else {
+        // Unpause logic: clear paused_until and reset deadline
+        setClauses.push(`paused_until = $${paramIndex++}`);
+        values.push(null);
+
         // Need to get current interval if not being updated
         let interval = updates.checkInIntervalHours;
 
@@ -125,11 +158,6 @@ router.patch('/me', async (req: Request, res: Response) => {
           );
           setClauses.push(`next_deadline = $${paramIndex++}`);
           values.push(nextDeadline);
-
-          // Also reset last_check_in to now so the cycle starts fresh? 
-          // Or leave it? If we leave it, it might look like they haven't checked in for a long time.
-          // But technically they were paused. 
-          // Let's just set next_deadline for now as requested.
         }
       }
     }
@@ -159,12 +187,13 @@ router.patch('/me', async (req: Request, res: Response) => {
       check_in_interval_hours: number;
       grace_period_hours: number;
       is_paused: boolean;
+      paused_until: Date | null;
       reminder_enabled: boolean;
       last_check_in: Date | null;
       next_deadline: Date | null;
     }>(
       `SELECT id, encrypted_display_name, contact_type, check_in_interval_hours,
-              grace_period_hours, is_paused, reminder_enabled, last_check_in, next_deadline
+              grace_period_hours, is_paused, paused_until, reminder_enabled, last_check_in, next_deadline
        FROM users WHERE id = $1`,
       [userId]
     );
@@ -179,6 +208,7 @@ router.patch('/me', async (req: Request, res: Response) => {
       checkInIntervalHours: user.check_in_interval_hours,
       gracePeriodHours: user.grace_period_hours,
       isPaused: user.is_paused,
+      pausedUntil: user.paused_until ? user.paused_until.toISOString() : null,
       reminderEnabled: user.reminder_enabled,
       lastCheckIn: user.last_check_in?.toISOString() ?? null,
       nextDeadline: user.next_deadline?.toISOString() ?? null,

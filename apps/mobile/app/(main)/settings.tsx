@@ -25,6 +25,7 @@ export default function SettingsScreen() {
   const { hasHardware, isEnrolled, biometricType, isAppLockEnabled, setAppLockEnabled } = useBiometric();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isPaused, setIsPaused] = useState(user?.isPaused ?? false);
+  const [pausedUntil, setPausedUntil] = useState(user?.pausedUntil ?? null);
   const [reminderEnabled, setReminderEnabled] = useState(user?.reminderEnabled ?? true);
 
   // Compute biometric label based on type
@@ -37,7 +38,8 @@ export default function SettingsScreen() {
   // Keep local state in sync with user object changes
   useEffect(() => {
     setIsPaused(user?.isPaused ?? false);
-  }, [user?.isPaused]);
+    setPausedUntil(user?.pausedUntil ?? null);
+  }, [user?.isPaused, user?.pausedUntil]);
 
   useEffect(() => {
     setReminderEnabled(user?.reminderEnabled ?? true);
@@ -45,14 +47,40 @@ export default function SettingsScreen() {
 
   const currentInterval = CHECK_IN_INTERVALS[user?.checkInIntervalHours ?? 48];
 
-  const handleTogglePause = async (value: boolean) => {
-    setIsPaused(value);
+  const handlePause = async () => {
+    Alert.alert(
+      '24h Pause',
+      'Möchtest du die Check-ins für 24 Stunden pausieren? Danach musst du dich wieder melden.',
+      [
+        { text: 'Abbrechen', style: 'cancel' },
+        {
+          text: 'Pausieren',
+          onPress: async () => {
+            try {
+              setIsPaused(true); // Optimistic
+              const updatedUser = await api.updateProfile({ isPaused: true });
+              setPausedUntil(updatedUser.pausedUntil);
+              await refreshUser();
+            } catch (error: any) {
+              setIsPaused(false);
+              Alert.alert('Fehler', error.message || 'Pause konnte nicht aktiviert werden.');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleResume = async () => {
     try {
-      await api.updateProfile({ isPaused: value });
+      setIsPaused(false); // Optimistic
+      setPausedUntil(null);
+      await api.updateProfile({ isPaused: false });
       await refreshUser();
+      Alert.alert('Willkommen zurück', 'Deine Pause wurde beendet.');
     } catch {
-      setIsPaused(!value);
-      Alert.alert('Fehler', 'Einstellung konnte nicht gespeichert werden.');
+      setIsPaused(true);
+      Alert.alert('Fehler', 'Pause konnte nicht beendet werden.');
     }
   };
 
@@ -166,11 +194,15 @@ export default function SettingsScreen() {
           />
           <ListRow
             icon="pause-circle"
-            iconColor="#8E8E93"
-            title="Pausieren"
-            subtitle="Für Urlaub oder Reisen"
-            switchValue={isPaused}
-            onSwitchChange={handleTogglePause}
+            iconColor={isPaused ? theme.warning : "#8E8E93"}
+            title={isPaused ? "Pause aktiv" : "24h Pause"}
+            subtitle={
+              isPaused && pausedUntil
+                ? `Endet ${new Date(pausedUntil).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} ${new Date(pausedUntil).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`
+                : "Für 24 Stunden keine Check-ins"
+            }
+            value={isPaused ? "Beenden" : undefined}
+            onPress={isPaused ? handleResume : handlePause}
           />
         </ListSection>
 

@@ -35,9 +35,9 @@ router.post('/', async (req: Request, res: Response) => {
       now.getTime() + (check_in_interval_hours + grace_period_hours) * 60 * 60 * 1000
     );
 
-    // Update user's last check-in and next deadline
+    // Update user's last check-in and next deadline, and unpause
     await db.query(
-      `UPDATE users SET last_check_in = $1, next_deadline = $2 WHERE id = $3`,
+      `UPDATE users SET last_check_in = $1, next_deadline = $2, is_paused = FALSE, paused_until = NULL WHERE id = $3`,
       [now, nextDeadline, userId]
     );
 
@@ -57,7 +57,8 @@ router.post('/', async (req: Request, res: Response) => {
       nextDeadline: nextDeadline.toISOString(),
       hoursRemaining,
       status: 'ok',
-      isPaused: is_paused,
+      isPaused: false, // Always unpaused after check-in
+      pausedUntil: null,
     });
   } catch (error) {
     console.error('Check-in error:', error);
@@ -74,8 +75,9 @@ router.get('/status', async (req: Request, res: Response) => {
       last_check_in: Date | null;
       next_deadline: Date | null;
       is_paused: boolean;
+      paused_until: Date | null;
     }>(
-      'SELECT last_check_in, next_deadline, is_paused FROM users WHERE id = $1',
+      'SELECT last_check_in, next_deadline, is_paused, paused_until FROM users WHERE id = $1',
       [userId]
     );
 
@@ -84,7 +86,7 @@ router.get('/status', async (req: Request, res: Response) => {
       return;
     }
 
-    const { last_check_in, next_deadline, is_paused } = result.rows[0];
+    const { last_check_in, next_deadline, is_paused, paused_until } = result.rows[0];
 
     let hoursRemaining: number | null = null;
     let status: 'ok' | 'warning' | 'overdue' = 'ok';
@@ -109,6 +111,7 @@ router.get('/status', async (req: Request, res: Response) => {
       hoursRemaining,
       status,
       isPaused: is_paused,
+      pausedUntil: paused_until?.toISOString() ?? null,
     });
   } catch (error) {
     console.error('Get status error:', error);

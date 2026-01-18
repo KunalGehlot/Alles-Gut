@@ -7,6 +7,7 @@ export interface User {
   checkInIntervalHours: number;
   gracePeriodHours: number;
   isPaused: boolean;
+  pausedUntil: string | null;
   reminderEnabled: boolean;
   lastCheckIn: string | null;
   nextDeadline: string | null;
@@ -21,6 +22,7 @@ export interface UserProfile {
   checkInIntervalHours: number;
   gracePeriodHours: number;
   isPaused: boolean;
+  pausedUntil: string | null;
   reminderEnabled: boolean;
   lastCheckIn: string | null;
   nextDeadline: string | null;
@@ -56,6 +58,7 @@ export interface CheckInStatus {
   hoursRemaining: number | null;
   status: 'ok' | 'warning' | 'overdue';
   isPaused: boolean;
+  pausedUntil: string | null;
 }
 
 // Alert types
