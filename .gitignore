@@ -11,12 +11,22 @@ out/
 
 # Expo
 .expo/
+.expo-shared/
+/app.json
 *.jks
 *.p8
 *.p12
 *.key
 *.mobileprovision
 *.orig.*
+*.apk
+*.aab
+*.ipa
+*.xcarchive
+
+# Expo prebuild native projects
+/android/
+/ios/
 
 # IDE
 .idea/
@@ -58,3 +68,17 @@ coverage/
 # Misc
 *.pem
 .cache/
+
+# Mobile build outputs
+apps/mobile/.expo/
+apps/mobile/.expo-shared/
+apps/mobile/dist/
+apps/mobile/web-build/
+apps/mobile/android/.gradle/
+apps/mobile/android/app/build/
+apps/mobile/android/build/
+apps/mobile/android/app/src/main/assets/
+apps/mobile/android/app/src/main/res/
+apps/mobile/ios/build/
+apps/mobile/ios/Pods/
+apps/mobile/ios/DerivedData/

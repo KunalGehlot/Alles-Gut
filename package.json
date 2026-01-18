@@ -12,7 +12,9 @@
     "lint": "turbo run lint",
     "clean": "turbo run clean",
     "mobile": "npm run dev --workspace=apps/mobile",
-    "api": "npm run dev --workspace=apps/api"
+    "api": "npm run dev --workspace=apps/api",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "devDependencies": {
     "turbo": "^2.0.0",
@@ -21,5 +23,10 @@
   "packageManager": "npm@10.0.0",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "expo": "~54.0.31",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }
