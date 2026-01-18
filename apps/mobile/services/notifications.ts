@@ -4,20 +4,28 @@ import Constants from 'expo-constants';
 import { Platform, Linking, Alert } from 'react-native';
 import { api } from './api';
 
-// Configure how notifications are displayed when app is in foreground
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-    priority: Notifications.AndroidNotificationPriority.MAX,
-  }),
-});
-
 // Critical alert channel ID for Android
 const CRITICAL_CHANNEL_ID = 'emergency-alerts';
 const DEFAULT_CHANNEL_ID = 'default';
 const isExpoGo = Constants.appOwnership === 'expo';
+
+// Check if push notifications are supported (not in Expo Go on Android)
+const isPushSupported = !(isExpoGo && Platform.OS === 'android');
+
+// Configure how notifications are displayed when app is in foreground
+// Only set up if push notifications are supported
+if (isPushSupported) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
+      priority: Notifications.AndroidNotificationPriority.MAX,
+    }),
+  });
+}
 const UUID_REGEX =
   /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
@@ -41,7 +49,7 @@ function getProjectId(): string | null {
  * Creates a high-priority channel that bypasses Do Not Disturb
  */
 export async function setupNotificationChannels(): Promise<void> {
-  if (Platform.OS !== 'android') return;
+  if (Platform.OS !== 'android' || !isPushSupported) return;
 
   // Create the critical/emergency alert channel
   await Notifications.setNotificationChannelAsync(CRITICAL_CHANNEL_ID, {
@@ -72,7 +80,7 @@ export async function setupNotificationChannels(): Promise<void> {
  * Check if DND override permission is granted on Android
  */
 export async function checkDndPermission(): Promise<boolean> {
-  if (Platform.OS !== 'android') return true;
+  if (Platform.OS !== 'android' || !isPushSupported) return true;
 
   // On Android 6+, we need ACCESS_NOTIFICATION_POLICY permission
   // This is automatically requested by Expo when notifications are set up
@@ -118,9 +126,9 @@ export async function registerForPushNotifications(): Promise<string | null> {
     return null;
   }
 
-  // Expo Go cannot deliver remote push notifications; use a dev build instead
-  if (isExpoGo) {
-    console.warn('Skipping push token fetch in Expo Go. Use a development build for push notifications.');
+  // Expo Go on Android cannot deliver remote push notifications; use a dev build instead
+  if (!isPushSupported) {
+    console.warn('Push notifications not supported in Expo Go on Android. Use a development build for push notifications.');
     return null;
   }
 
@@ -186,6 +194,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
  * Check if push notifications are enabled
  */
 export async function areNotificationsEnabled(): Promise<boolean> {
+  if (!isPushSupported) return false;
   const { status } = await Notifications.getPermissionsAsync();
   return status === 'granted';
 }
@@ -194,7 +203,7 @@ export async function areNotificationsEnabled(): Promise<boolean> {
  * Get the current push token if one exists
  */
 export async function getCurrentPushToken(): Promise<string | null> {
-  if (isExpoGo) {
+  if (!isPushSupported) {
     return null;
   }
 
@@ -217,6 +226,10 @@ export async function getCurrentPushToken(): Promise<string | null> {
  * Schedule a local notification (for testing)
  */
 export async function scheduleTestNotification(): Promise<void> {
+  if (!isPushSupported) {
+    console.warn('Local notifications not supported in Expo Go on Android');
+    return;
+  }
   await Notifications.scheduleNotificationAsync({
     content: {
       title: 'Test Benachrichtigung',
@@ -231,12 +244,18 @@ export async function scheduleTestNotification(): Promise<void> {
   });
 }
 
+// No-op subscription for when notifications aren't supported
+const noOpSubscription: Notifications.EventSubscription = {
+  remove: () => {},
+};
+
 /**
  * Add a listener for notification responses (when user taps a notification)
  */
 export function addNotificationResponseListener(
   callback: (response: Notifications.NotificationResponse) => void
 ): Notifications.EventSubscription {
+  if (!isPushSupported) return noOpSubscription;
   return Notifications.addNotificationResponseReceivedListener(callback);
 }
 
@@ -246,5 +265,6 @@ export function addNotificationResponseListener(
 export function addNotificationReceivedListener(
   callback: (notification: Notifications.Notification) => void
 ): Notifications.EventSubscription {
+  if (!isPushSupported) return noOpSubscription;
   return Notifications.addNotificationReceivedListener(callback);
 }
