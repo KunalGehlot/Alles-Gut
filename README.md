@@ -12,6 +12,10 @@ A privacy-first life check-in app. Users send regular "I'm OK" signals to their 
   - [2. Environment Setup](#2-environment-setup)
   - [3. Database Setup](#3-database-setup)
   - [4. Running Locally](#4-running-locally)
+- [Features](#features)
+  - [Safe Check-ins](#safe-check-ins)
+  - [Strict Pausing](#strict-pausing)
+  - [Security](#security)
 - [Testing](#testing)
 - [Deployment](#deployment)
 - [Troubleshooting](#troubleshooting)
@@ -21,9 +25,10 @@ A privacy-first life check-in app. Users send regular "I'm OK" signals to their 
 ## Overview
 
 **Alles Gut** (German: "All Good") provides peace of mind through periodic check-ins.
-- **Privacy-First**: End-to-end encryption for all user data.
+- **Privacy-First**: End-to-end encryption for all user data (AES-256).
 - **Reliable**: Automatic notifications via email and push notifications if a check-in is missed.
 - **Simple**: One-tap check-ins.
+- **Strict**: 24-hour only pause mechanism to prevent long-term tracking avoidance.
 
 ---
 
@@ -48,8 +53,9 @@ graph TD
 ```
 
 - **Backend**: Node.js, Express, PostgreSQL
-- **Frontend**: React Native, Expo
-- **Shared**: TypeScript interfaces and constants
+- **Frontend**: React Native, Expo (Expo Router)
+- **Shared**: TypeScript interfaces, constants, and types
+- **Database**: PostgreSQL (Railway)
 
 ---
 
@@ -153,6 +159,24 @@ Press `i` for iOS simulator, `a` for Android emulator, or scan the QR code with 
 
 ---
 
+## Features
+
+### Safe Check-ins
+Primary interface allows for a quick "Alles Gut" tap. This resets your deadline based on your chosen interval (default 48h).
+
+### Strict Pausing
+Users can pause check-ins for **exactly 24 hours**. 
+- Cannot pause if already overdue.
+- Cannot extend an active pause.
+- Must manually verify (check-in) to unpause or after the timer expires.
+
+### Security
+- **Encryption**: Names and contact info are encrypted at rest using AES-256-CBC. keys are never stored in plain text in the DB.
+- **Biometrics**: Mobile app supports blocking access via FaceID/TouchID.
+- **GDPR**: Full export and strict deletion support.
+
+---
+
 ## Testing
 
 Currently, the project relies on **manual verification**. Use the following flow to verify changes:
@@ -163,6 +187,7 @@ Currently, the project relies on **manual verification**. Use the following flow
 3.  **Add Contact**: Add a dummy contact email.
 4.  **Check-In**: Tap the main check-in button.
     -   *Verify*: Last check-in time updates.
+5.  **Pause**: Test the 24h pause feature in Settings.
 
 ---
 
@@ -176,6 +201,12 @@ The API includes a `Dockerfile` and `railway.toml` for easy deployment on [Railw
 2.  Add a PostgreSQL plugin.
 3.  Set production environment variables in Railway dashboard.
 4.  Railway will automatically build and deploy using the Dockerfile.
+
+Alternatively, use the Railway CLI:
+```bash
+railway link
+railway up
+```
 
 ### Mobile (Expo EAS)
 
