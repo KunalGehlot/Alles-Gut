@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import Constants from 'expo-constants';
 import { Platform, Linking, Alert } from 'react-native';
 import { api } from './api';
 
@@ -16,6 +17,24 @@ Notifications.setNotificationHandler({
 // Critical alert channel ID for Android
 const CRITICAL_CHANNEL_ID = 'emergency-alerts';
 const DEFAULT_CHANNEL_ID = 'default';
+const isExpoGo = Constants.appOwnership === 'expo';
+const UUID_REGEX =
+  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
+function getProjectId(): string | null {
+  const projectId =
+    process.env.EXPO_PUBLIC_EAS_PROJECT_ID ||
+    process.env.EAS_PROJECT_ID ||
+    (Constants.expoConfig?.extra as any)?.eas?.projectId ||
+    (Constants.expoConfig as any)?.projectId ||
+    (Constants as any).easConfig?.projectId;
+
+  if (!projectId || typeof projectId !== 'string' || !UUID_REGEX.test(projectId)) {
+    return null;
+  }
+
+  return projectId;
+}
 
 /**
  * Set up notification channels for Android
@@ -99,6 +118,20 @@ export async function registerForPushNotifications(): Promise<string | null> {
     return null;
   }
 
+  // Expo Go cannot deliver remote push notifications; use a dev build instead
+  if (isExpoGo) {
+    console.warn('Skipping push token fetch in Expo Go. Use a development build for push notifications.');
+    return null;
+  }
+
+  const projectId = getProjectId();
+  if (!projectId) {
+    console.warn(
+      'Skipping push token fetch: missing EAS project ID. Set expo.extra.eas.projectId or EXPO_PUBLIC_EAS_PROJECT_ID.'
+    );
+    return null;
+  }
+
   // Set up notification channels first
   await setupNotificationChannels();
 
@@ -133,7 +166,7 @@ export async function registerForPushNotifications(): Promise<string | null> {
   try {
     // Get the Expo push token
     const tokenData = await Notifications.getExpoPushTokenAsync({
-      projectId: 'your-project-id', // This should match your Expo project ID
+      projectId,
     });
 
     const token = tokenData.data;
@@ -161,9 +194,18 @@ export async function areNotificationsEnabled(): Promise<boolean> {
  * Get the current push token if one exists
  */
 export async function getCurrentPushToken(): Promise<string | null> {
+  if (isExpoGo) {
+    return null;
+  }
+
+  const projectId = getProjectId();
+  if (!projectId) {
+    return null;
+  }
+
   try {
     const tokenData = await Notifications.getExpoPushTokenAsync({
-      projectId: 'your-project-id',
+      projectId,
     });
     return tokenData.data;
   } catch {

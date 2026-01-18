@@ -115,9 +115,11 @@ Required variables:
 | Variable | Description |
 |----------|-------------|
 | `EXPO_PUBLIC_API_URL` | URL of your local API. |
+| `EXPO_PUBLIC_EAS_PROJECT_ID` | EAS project UUID (required for push notifications). |
 
 > [!IMPORTANT]
-> If testing on a physical device, `localhost` will not work. Use your machine's local IP address (e.g., `http://192.168.1.50:3000`).
+> - If testing on a physical device, `localhost` will not work. Use your machine's local IP address (e.g., `http://192.168.1.50:3000`).
+> - Push notifications require a development build (not Expo Go) with a valid `EXPO_PUBLIC_EAS_PROJECT_ID`.
 
 ### 3. Database Setup
 
