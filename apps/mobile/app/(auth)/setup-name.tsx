@@ -42,7 +42,7 @@ export default function SetupNameScreen() {
         style={styles.keyboardView}
       >
         <View style={styles.header}>
-          <Pressable onPress={() => router.back()} style={styles.backButton}>
+          <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace('/(auth)/verify')} style={styles.backButton}>
             <Text style={styles.backText}>&#x2190;</Text>
           </Pressable>
         </View>

@@ -61,8 +61,10 @@ export default function RegisterScreen() {
       setStep('select-method');
       setContactInfo('');
       setError(null);
-    } else {
+    } else if (router.canGoBack()) {
       router.back();
+    } else {
+      router.replace('/(auth)/welcome');
     }
   };
 
