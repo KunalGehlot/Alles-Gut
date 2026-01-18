@@ -92,7 +92,6 @@ function RootLayoutInner() {
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: theme.background },
-          animation: 'slide_from_right',
         }}
       >
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
