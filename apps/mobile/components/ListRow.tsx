@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, Switch, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Switch, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing } from '@/constants/typography';
@@ -64,7 +64,8 @@ export function ListRow({
           value={switchValue}
           onValueChange={onSwitchChange}
           trackColor={{ false: theme.separator, true: theme.primary }}
-          thumbColor="#FFFFFF"
+          thumbColor={Platform.OS === 'android' ? (switchValue ? '#FFFFFF' : '#F4F4F4') : '#FFFFFF'}
+          ios_backgroundColor={theme.separator}
         />
       )}
       {!isSwitch && showChevron && onPress && (

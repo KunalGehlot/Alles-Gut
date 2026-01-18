@@ -48,7 +48,7 @@ export default function AboutScreen() {
         <ListSection title="Funktionen">
           <ListRow
             icon="shield-checkmark"
-            iconColor="#34C759"
+            iconColor={theme.success}
             title="Sichere Check-ins"
             subtitle="Einfaches Bestätigen mit einem Tap"
             showChevron={false}

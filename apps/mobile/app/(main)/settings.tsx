@@ -187,7 +187,7 @@ export default function SettingsScreen() {
         >
           <ListRow
             icon="notifications"
-            iconColor={notificationsEnabled ? '#34C759' : '#FF3B30'}
+            iconColor={notificationsEnabled ? theme.success : theme.danger}
             title="Push-Benachrichtigungen"
             value={notificationsEnabled ? 'Aktiviert' : 'Deaktiviert'}
             onPress={() => {
@@ -201,7 +201,7 @@ export default function SettingsScreen() {
           {Platform.OS === 'android' && (
             <ListRow
               icon="volume-high"
-              iconColor={isDndBypassed ? '#34C759' : '#FF9500'}
+              iconColor={isDndBypassed ? theme.success : theme.warning}
               title="Kritische Benachrichtigungen"
               subtitle='"Nicht stören" umgehen'
               value={isDndBypassed ? 'Aktiviert' : 'Deaktiviert'}
@@ -250,7 +250,7 @@ export default function SettingsScreen() {
           />
           <ListRow
             icon="download"
-            iconColor="#34C759"
+            iconColor={theme.success}
             title="Meine Daten exportieren"
             onPress={handleExportData}
           />

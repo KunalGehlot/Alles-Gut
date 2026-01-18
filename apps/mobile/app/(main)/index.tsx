@@ -43,7 +43,9 @@ export default function HomeScreen() {
   const activeContacts = contacts.filter((c) => c.status === 'accepted');
   const hoursRemaining = calculateHoursRemaining(status?.nextDeadline ?? null);
   const isWarning = hoursRemaining !== null && hoursRemaining <= WARNING_THRESHOLD_HOURS;
-  const isPaused = status?.isPaused ?? false;
+  // Use user.isPaused as primary source (updated immediately from settings),
+  // fall back to status.isPaused for initial load
+  const isPaused = user?.isPaused ?? status?.isPaused ?? false;
 
   // Start breathing animation on mount
   useEffect(() => {

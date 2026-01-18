@@ -15,6 +15,7 @@
     "api": "npm run dev --workspace=apps/api"
   },
   "devDependencies": {
+    "@types/react": "~19.1.10",
     "turbo": "^2.0.0",
     "typescript": "^5.3.0"
   },
