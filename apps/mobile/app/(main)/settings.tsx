@@ -6,6 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useBiometric } from '@/hooks/useBiometric';
 import { api } from '@/services/api';
 import { ListSection, ListRow, Button } from '@/components';
 
@@ -21,9 +22,17 @@ export default function SettingsScreen() {
   const { theme } = useTheme();
   const { user, logout, refreshUser } = useAuth();
   const { isEnabled: notificationsEnabled, isDndBypassed, registerNotifications, requestDndBypass } = useNotifications();
+  const { hasHardware, isEnrolled, biometricType, isAppLockEnabled, setAppLockEnabled } = useBiometric();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isPaused, setIsPaused] = useState(user?.isPaused ?? false);
   const [reminderEnabled, setReminderEnabled] = useState(user?.reminderEnabled ?? true);
+
+  // Compute biometric label based on type
+  const biometricLabel = biometricType === 'faceid'
+    ? 'Face ID'
+    : biometricType === 'touchid'
+      ? 'Touch ID'
+      : 'Fingerabdruck';
 
   // Keep local state in sync with user object changes
   useEffect(() => {
@@ -214,6 +223,22 @@ export default function SettingsScreen() {
             onSwitchChange={handleToggleReminder}
           />
         </ListSection>
+
+        {/* Security Section - Biometric Lock */}
+        {hasHardware && isEnrolled && (
+          <ListSection
+            title="Sicherheit"
+            footer="Schütze die App mit biometrischer Authentifizierung"
+          >
+            <ListRow
+              icon="finger-print"
+              iconColor="#5856D6"
+              title={`Mit ${biometricLabel} sperren`}
+              switchValue={isAppLockEnabled}
+              onSwitchChange={setAppLockEnabled}
+            />
+          </ListSection>
+        )}
 
         {/* Privacy Section */}
         <ListSection title="Datenschutz">

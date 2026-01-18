@@ -18,7 +18,11 @@
       "bundleIdentifier": "app.allesgut.mobile",
       "infoPlist": {
         "NSCameraUsageDescription": "Kamera wird benötigt um QR-Codes zu scannen",
-        "CFBundleLocalizations": ["de", "en"],
+        "NSFaceIDUsageDescription": "FaceID wird verwendet, um die App sicher zu entsperren",
+        "CFBundleLocalizations": [
+          "de",
+          "en"
+        ],
         "CFBundleDevelopmentRegion": "de"
       }
     },
@@ -33,7 +37,9 @@
         "VIBRATE",
         "RECEIVE_BOOT_COMPLETED",
         "android.permission.ACCESS_NOTIFICATION_POLICY",
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
       ]
     },
     "web": {
@@ -44,6 +50,12 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "FaceID wird verwendet, um die App sicher zu entsperren"
+        }
+      ],
       [
         "expo-notifications",
         {
