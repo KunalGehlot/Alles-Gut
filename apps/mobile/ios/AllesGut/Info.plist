@@ -53,7 +53,7 @@
     <key>NSCameraUsageDescription</key>
     <string>Kamera wird benötigt um QR-Codes zu scannen</string>
     <key>NSFaceIDUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to access your Face ID biometric data.</string>
+    <string>FaceID wird verwendet, um die App sicher zu entsperren</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your microphone</string>
     <key>NSUserActivityTypes</key>
