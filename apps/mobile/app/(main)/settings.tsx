@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, Linking, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -24,6 +24,15 @@ export default function SettingsScreen() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isPaused, setIsPaused] = useState(user?.isPaused ?? false);
   const [reminderEnabled, setReminderEnabled] = useState(user?.reminderEnabled ?? true);
+
+  // Keep local state in sync with user object changes
+  useEffect(() => {
+    setIsPaused(user?.isPaused ?? false);
+  }, [user?.isPaused]);
+
+  useEffect(() => {
+    setReminderEnabled(user?.reminderEnabled ?? true);
+  }, [user?.reminderEnabled]);
 
   const currentInterval = CHECK_IN_INTERVALS[user?.checkInIntervalHours ?? 48];
 
@@ -163,8 +172,8 @@ export default function SettingsScreen() {
             !notificationsEnabled
               ? '⚠️ Benachrichtigungen sind deaktiviert. Aktiviere sie in den Einstellungen, um Notfall-Benachrichtigungen zu erhalten.'
               : Platform.OS === 'android' && !isDndBypassed
-              ? '⚠️ Kritische Benachrichtigungen können "Nicht stören" nicht umgehen. Aktiviere diese Berechtigung für maximale Zuverlässigkeit.'
-              : 'Benachrichtigungen sind aktiviert. Du wirst bei Notfällen benachrichtigt.'
+                ? '⚠️ Kritische Benachrichtigungen können "Nicht stören" nicht umgehen. Aktiviere diese Berechtigung für maximale Zuverlässigkeit.'
+                : 'Benachrichtigungen sind aktiviert. Du wirst bei Notfällen benachrichtigt.'
           }
         >
           <ListRow

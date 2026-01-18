@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import Animated, {
   withSpring,
   withSequence,
 } from 'react-native-reanimated';
+import { useFocusEffect } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
@@ -78,9 +79,12 @@ export default function HomeScreen() {
     opacity: successOpacity.value,
   }));
 
-  useEffect(() => {
-    refreshStatus();
-  }, [refreshStatus]);
+  // Refresh status when screen gains focus (e.g., returning from Settings)
+  useFocusEffect(
+    useCallback(() => {
+      refreshStatus();
+    }, [refreshStatus])
+  );
 
   if (isLoading) {
     return (
@@ -118,8 +122,8 @@ export default function HomeScreen() {
   const buttonColor = isPaused
     ? theme.textTertiary
     : isWarning
-    ? theme.warning
-    : theme.primary;
+      ? theme.warning
+      : theme.primary;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
@@ -234,9 +238,8 @@ export default function HomeScreen() {
             <Text style={[styles.contactsText, { color: theme.textSecondary }]}>
               {activeContacts.length === 0
                 ? 'Keine Kontakte hinzugefügt'
-                : `${activeContacts.length} ${
-                    activeContacts.length === 1 ? 'Kontakt wird' : 'Kontakte werden'
-                  } benachrichtigt`}
+                : `${activeContacts.length} ${activeContacts.length === 1 ? 'Kontakt wird' : 'Kontakte werden'
+                } benachrichtigt`}
             </Text>
           </View>
         )}
