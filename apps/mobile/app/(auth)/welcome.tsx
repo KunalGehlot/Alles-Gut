@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { Button } from '@/components';
@@ -9,6 +10,7 @@ import { Button } from '@/components';
 export default function WelcomeScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
@@ -17,9 +19,9 @@ export default function WelcomeScreen() {
           <View style={[styles.logoCircle, { backgroundColor: theme.primary }]}>
             <Ionicons name="heart" size={48} color="#FFFFFF" />
           </View>
-          <Text style={[styles.appName, { color: theme.text }]}>Alles Gut</Text>
+          <Text style={[styles.appName, { color: theme.text }]}>{t('app.name')}</Text>
           <Text style={[styles.tagline, { color: theme.textSecondary }]}>
-            Dein digitales Lebenszeichen
+            {t('app.tagline')}
           </Text>
         </View>
 
@@ -29,7 +31,7 @@ export default function WelcomeScreen() {
               <Ionicons name="shield-checkmark" size={20} color={theme.primary} />
             </View>
             <Text style={[styles.featureText, { color: theme.text }]}>
-              Regelmäßige Check-ins für deine Sicherheit
+              {t('privacy.regularCheckIns')}
             </Text>
           </View>
           <View style={styles.featureRow}>
@@ -37,7 +39,7 @@ export default function WelcomeScreen() {
               <Ionicons name="people" size={20} color={theme.primary} />
             </View>
             <Text style={[styles.featureText, { color: theme.text }]}>
-              Bis zu 5 Notfallkontakte
+              {t('privacy.upToContacts')}
             </Text>
           </View>
           <View style={styles.featureRow}>
@@ -45,20 +47,20 @@ export default function WelcomeScreen() {
               <Ionicons name="lock-closed" size={20} color={theme.primary} />
             </View>
             <Text style={[styles.featureText, { color: theme.text }]}>
-              Ende-zu-Ende verschlüsselt
+              {t('privacy.endToEndEncrypted')}
             </Text>
           </View>
         </View>
 
         <View style={styles.buttonContainer}>
           <Button
-            title="Jetzt starten"
+            title={t('auth.getStarted')}
             onPress={() => router.push('/(auth)/register')}
             size="large"
             fullWidth
           />
           <Button
-            title="Bereits registriert? Anmelden"
+            title={t('auth.alreadyRegistered')}
             variant="ghost"
             onPress={() => router.push('/(auth)/register?mode=login')}
             fullWidth
@@ -68,7 +70,7 @@ export default function WelcomeScreen() {
         <View style={styles.privacyContainer}>
           <Ionicons name="shield" size={18} color={theme.textSecondary} />
           <Text style={[styles.privacyText, { color: theme.textSecondary }]}>
-            DSGVO-konform · Made in Germany
+            {t('privacy.gdprCompliant')} · {t('privacy.madeInGermany')}
           </Text>
         </View>
       </View>

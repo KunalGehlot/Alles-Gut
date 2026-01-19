@@ -8,24 +8,26 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/colors';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
 
-const INTERVALS = [
-  { value: 24, label: 'Alle 24 Stunden', recommended: false },
-  { value: 48, label: 'Alle 48 Stunden', recommended: true },
-  { value: 72, label: 'Alle 72 Stunden', recommended: false },
-  { value: 168, label: 'Einmal pro Woche', recommended: false },
-];
-
 export default function SetupIntervalScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { displayName } = useLocalSearchParams<{ displayName: string }>();
   const { updateProfile } = useAuth();
   const [selectedInterval, setSelectedInterval] = useState(48);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const INTERVALS = [
+    { value: 24, label: t('auth.every24Hours'), recommended: false },
+    { value: 48, label: t('auth.every48Hours'), recommended: true },
+    { value: 72, label: t('auth.every72Hours'), recommended: false },
+    { value: 168, label: t('auth.everyWeek'), recommended: false },
+  ];
 
   const handleComplete = async () => {
     if (!displayName) return;
@@ -38,7 +40,7 @@ export default function SetupIntervalScreen() {
       // Navigate to root - index.tsx will redirect to (main) since user is authenticated
       router.replace('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten.');
+      setError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +55,7 @@ export default function SetupIntervalScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.title}>Wie oft möchtest du dich melden?</Text>
+        <Text style={styles.title}>{t('auth.intervalQuestion')}</Text>
 
         <View style={styles.optionsContainer}>
           {INTERVALS.map((interval) => (
@@ -78,7 +80,7 @@ export default function SetupIntervalScreen() {
               >
                 {interval.label}
                 {interval.recommended && (
-                  <Text style={styles.recommendedText}> (empfohlen)</Text>
+                  <Text style={styles.recommendedText}> {t('auth.recommended')}</Text>
                 )}
               </Text>
             </Pressable>
@@ -88,8 +90,7 @@ export default function SetupIntervalScreen() {
         <View style={styles.infoBox}>
           <Text style={styles.infoIcon}>&#x2139;</Text>
           <Text style={styles.infoText}>
-            Nach Ablauf dieser Zeit + 6 Stunden Karenzzeit werden deine Kontakte
-            benachrichtigt.
+            {t('auth.intervalHint')}
           </Text>
         </View>
 
@@ -108,7 +109,7 @@ export default function SetupIntervalScreen() {
             {isLoading ? (
               <ActivityIndicator color={Colors.white} />
             ) : (
-              <Text style={styles.primaryButtonText}>Fertig</Text>
+              <Text style={styles.primaryButtonText}>{t('auth.done')}</Text>
             )}
           </Pressable>
         </View>
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: Typography.fontSize['2xl'],
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   content: {
     flex: 1,
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.fontSize['2xl'],
     fontWeight: '600',
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xl,
     lineHeight: Typography.lineHeight['2xl'],
   },
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: Typography.fontSize.lg,
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   optionTextSelected: {
     fontWeight: '500',

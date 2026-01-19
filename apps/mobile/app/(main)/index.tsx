@@ -20,6 +20,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { useFocusEffect } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
@@ -31,6 +32,7 @@ const WARNING_THRESHOLD_HOURS = 6;
 
 export default function HomeScreen() {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { status, isLoading, isCheckingIn, checkIn, refreshStatus, error: checkInError } = useCheckIn();
   const { contacts } = useContacts();
@@ -87,8 +89,8 @@ export default function HomeScreen() {
     } catch (error) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(
-        'Fehler',
-        error instanceof Error ? error.message : 'Check-in fehlgeschlagen. Bitte versuche es erneut.'
+        t('common.error'),
+        error instanceof Error ? error.message : t('errors.checkInFailed')
       );
     }
   };
@@ -125,7 +127,7 @@ export default function HomeScreen() {
         <View style={styles.loadingContainer}>
           <Ionicons name="warning-outline" size={48} color={theme.danger} />
           <Text style={[styles.greeting, { color: theme.text, marginTop: 16 }]}>
-            Verbindungsfehler
+            {t('errors.connectionError')}
           </Text>
           <Text style={[styles.lastCheckIn, { color: theme.textSecondary, textAlign: 'center', marginHorizontal: 32 }]}>
             {checkInError}
@@ -134,7 +136,7 @@ export default function HomeScreen() {
             style={[styles.retryButton, { backgroundColor: theme.primary }]}
             onPress={refreshStatus}
           >
-            <Text style={styles.retryButtonText}>Erneut versuchen</Text>
+            <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -150,9 +152,9 @@ export default function HomeScreen() {
   // Get time-based greeting
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return { text: 'Guten Morgen', icon: 'sunny-outline' as const };
-    if (hour < 18) return { text: 'Guten Tag', icon: 'partly-sunny-outline' as const };
-    return { text: 'Guten Abend', icon: 'moon-outline' as const };
+    if (hour < 12) return { text: t('home.goodMorning'), icon: 'sunny-outline' as const };
+    if (hour < 18) return { text: t('home.goodAfternoon'), icon: 'partly-sunny-outline' as const };
+    return { text: t('home.goodEvening'), icon: 'moon-outline' as const };
   };
 
   const greeting = getGreeting();
@@ -171,7 +173,7 @@ export default function HomeScreen() {
         {/* Main Heading */}
         <View style={styles.header}>
           <Text style={[styles.mainHeading, { color: theme.text }]}>
-            Wie geht's dir?
+            {t('home.howAreYou')}
           </Text>
         </View>
 
@@ -179,13 +181,13 @@ export default function HomeScreen() {
         {isPaused && !showSuccess && (
           <View style={[styles.banner, { backgroundColor: theme.textSecondary }]}>
             <Ionicons name="pause-circle" size={20} color="#FFFFFF" />
-            <Text style={styles.bannerText}>Check-in ist pausiert</Text>
+            <Text style={styles.bannerText}>{t('home.checkInPaused')}</Text>
           </View>
         )}
         {isWarning && !isPaused && !showSuccess && (
           <View style={[styles.banner, { backgroundColor: theme.warning }]}>
             <Ionicons name="warning" size={20} color="#FFFFFF" />
-            <Text style={styles.bannerText}>Bitte melde dich bald!</Text>
+            <Text style={styles.bannerText}>{t('home.pleaseCheckInSoon')}</Text>
           </View>
         )}
 
@@ -197,13 +199,13 @@ export default function HomeScreen() {
                 <Ionicons name="checkmark" size={64} color="#FFFFFF" />
               </View>
               <Text style={[styles.successTitle, { color: theme.text }]}>
-                Lebenszeichen gesendet!
+                {t('home.checkInSent')}
               </Text>
               <Text style={[styles.successTime, { color: theme.text }]}>
                 {formatDate(status?.lastCheckIn ?? null)}
               </Text>
               <Text style={[styles.successDeadline, { color: theme.textSecondary }]}>
-                Nächste Frist: {formatDate(status?.nextDeadline ?? null)}
+                {t('home.nextDeadline')}: {formatDate(status?.nextDeadline ?? null)}
               </Text>
             </Animated.View>
           ) : (
@@ -212,7 +214,7 @@ export default function HomeScreen() {
               {!isPaused && (
                 <View style={[styles.readyButton, { backgroundColor: theme.surface }]}>
                   <Text style={[styles.readyButtonText, { color: theme.textSecondary }]}>
-                    Bereit für Check-In
+                    {t('home.readyForCheckIn')}
                   </Text>
                 </View>
               )}
@@ -243,7 +245,7 @@ export default function HomeScreen() {
               </Animated.View>
               {!isPaused && (
                 <Text style={[styles.tapHint, { color: theme.textSecondary }]}>
-                  Ein Tap genügt, um alle zu beruhigen.
+                  {t('home.tapHint')}
                 </Text>
               )}
             </>
@@ -260,10 +262,10 @@ export default function HomeScreen() {
               </View>
               <View style={styles.infoCardContent}>
                 <Text style={[styles.infoCardLabel, { color: theme.textSecondary }]}>
-                  Letzter Check-In
+                  {t('home.lastCheckIn')}
                 </Text>
                 <Text style={[styles.infoCardValue, { color: theme.text }]}>
-                  {status?.lastCheckIn ? formatDate(status.lastCheckIn).split(',')[0] : 'Noch kein Check-In'}
+                  {status?.lastCheckIn ? formatDate(status.lastCheckIn).split(',')[0] : t('home.noCheckInYet')}
                 </Text>
               </View>
             </View>
@@ -275,10 +277,10 @@ export default function HomeScreen() {
               </View>
               <View style={styles.infoCardContent}>
                 <Text style={[styles.infoCardLabel, { color: theme.textSecondary }]}>
-                  Kontakte
+                  {t('contacts.title')}
                 </Text>
                 <Text style={[styles.infoCardValue, { color: theme.text }]}>
-                  {activeContacts.length === 0 ? 'Keine' : activeContacts.length.toString()}
+                  {activeContacts.length === 0 ? t('common.none') : activeContacts.length.toString()}
                 </Text>
               </View>
             </View>
@@ -288,7 +290,7 @@ export default function HomeScreen() {
         {/* Warning notification */}
         {!showSuccess && hoursRemaining !== null && hoursRemaining <= WARNING_THRESHOLD_HOURS && !isPaused && (
           <Text style={[styles.warningNotification, { color: theme.textSecondary }]}>
-            Benachrichtigung nach 48 Stunden ohne Check-In
+            {t('home.notificationWarning')}
           </Text>
         )}
       </View>

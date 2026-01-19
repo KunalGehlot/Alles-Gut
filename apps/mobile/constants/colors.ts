@@ -84,7 +84,7 @@ export const DarkTheme = {
   overlay: 'rgba(0, 0, 0, 0.6)',
 } as const;
 
-export type Theme = typeof LightTheme;
+export type Theme = typeof LightTheme | typeof DarkTheme;
 export type ThemeColors = keyof Theme;
 
 // Legacy export for backwards compatibility during migration

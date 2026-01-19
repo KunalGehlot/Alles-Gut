@@ -1,3 +1,5 @@
+
+import '@/locales'; // Initialize i18n FIRST
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { Stack } from 'expo-router';
@@ -5,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthContext, useAuthProvider } from '@/hooks/useAuth';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { LocaleProvider } from '@/contexts/LocaleContext';
 import { useBiometric } from '@/hooks/useBiometric';
 import { LockScreen } from '@/components';
 import { registerForPushNotifications, setupNotificationChannels } from '@/services/notifications';
@@ -103,8 +106,10 @@ function RootLayoutInner() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <RootLayoutInner />
-    </ThemeProvider>
+    <LocaleProvider>
+      <ThemeProvider>
+        <RootLayoutInner />
+      </ThemeProvider>
+    </LocaleProvider>
   );
 }

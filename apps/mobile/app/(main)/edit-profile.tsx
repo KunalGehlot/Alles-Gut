@@ -11,23 +11,26 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/services/api';
 import { ListSection, ListRow, Button } from '@/components';
 
-const CHECK_IN_INTERVALS = [
-  { value: 24, label: 'Alle 24 Stunden', description: 'Täglicher Check-in' },
-  { value: 48, label: 'Alle 48 Stunden', description: 'Jeden zweiten Tag' },
-  { value: 72, label: 'Alle 72 Stunden', description: 'Alle drei Tage' },
-  { value: 168, label: 'Einmal pro Woche', description: 'Wöchentlicher Check-in' },
-];
-
 export default function EditProfileScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const { user, refreshUser } = useAuth();
+
+  // Check-in intervals with translations
+  const CHECK_IN_INTERVALS = [
+    { value: 24, label: t('settings.every24Hours'), description: t('settings.dailyCheckIn') },
+    { value: 48, label: t('settings.every48Hours'), description: t('settings.everyOtherDay') },
+    { value: 72, label: t('settings.every72Hours'), description: t('settings.every3Days') },
+    { value: 168, label: t('settings.everyWeek'), description: t('settings.weeklyCheckIn') },
+  ];
 
   const [displayName, setDisplayName] = useState(user?.displayName ?? '');
   const [selectedInterval, setSelectedInterval] = useState(
@@ -53,7 +56,7 @@ export default function EditProfileScreen() {
 
   const handleSave = async () => {
     if (!isValid) {
-      Alert.alert('Fehler', 'Der Name muss mindestens 2 Zeichen lang sein.');
+      Alert.alert(t('common.error'), t('validation.nameTooShort'));
       return;
     }
 
@@ -66,7 +69,7 @@ export default function EditProfileScreen() {
       await refreshUser();
       router.back();
     } catch {
-      Alert.alert('Fehler', 'Profil konnte nicht gespeichert werden.');
+      Alert.alert(t('common.error'), t('errors.profileSaveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -75,11 +78,11 @@ export default function EditProfileScreen() {
   const handleBack = () => {
     if (hasChanges) {
       Alert.alert(
-        'Änderungen verwerfen?',
-        'Du hast ungespeicherte Änderungen. Möchtest du wirklich zurückgehen?',
+        t('settings.discardChanges'),
+        t('settings.discardChangesMessage'),
         [
-          { text: 'Abbrechen', style: 'cancel' },
-          { text: 'Verwerfen', style: 'destructive', onPress: () => router.back() },
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('common.discard'), style: 'destructive', onPress: () => router.back() },
         ]
       );
     } else {
@@ -93,7 +96,7 @@ export default function EditProfileScreen() {
         <Pressable onPress={handleBack} style={styles.backButton}>
           <Ionicons name="chevron-back" size={28} color={theme.primary} />
         </Pressable>
-        <Text style={[styles.title, { color: theme.text }]}>Profil bearbeiten</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('settings.editProfile')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -103,13 +106,13 @@ export default function EditProfileScreen() {
         keyboardShouldPersistTaps="handled"
       >
         {/* Display Name */}
-        <ListSection title="Anzeigename">
+        <ListSection title={t('settings.displayName')}>
           <View style={[styles.inputContainer, { backgroundColor: theme.surface }]}>
             <TextInput
               style={[styles.input, { color: theme.text }]}
               value={displayName}
               onChangeText={setDisplayName}
-              placeholder="Dein Name"
+              placeholder={t('settings.yourName')}
               placeholderTextColor={theme.textTertiary}
               autoCapitalize="words"
               autoCorrect={false}
@@ -118,13 +121,13 @@ export default function EditProfileScreen() {
           </View>
         </ListSection>
         <Text style={[styles.hint, { color: theme.textSecondary }]}>
-          Dieser Name wird deinen Kontakten angezeigt.
+          {t('settings.displayNameHint')}
         </Text>
 
         {/* Check-in Interval */}
         <ListSection
-          title="Check-in Intervall"
-          footer="Nach Ablauf des Intervalls + 6 Stunden Karenzzeit werden deine Kontakte benachrichtigt."
+          title={t('settings.checkInInterval')}
+          footer={t('settings.intervalFooter')}
         >
           {CHECK_IN_INTERVALS.map((interval) => (
             <ListRow
@@ -148,7 +151,7 @@ export default function EditProfileScreen() {
         {/* Save Button */}
         <View style={styles.saveContainer}>
           <Button
-            title={isSaving ? 'Wird gespeichert...' : 'Speichern'}
+            title={isSaving ? t('common.saving') : t('common.save')}
             onPress={handleSave}
             disabled={!hasChanges || !isValid || isSaving}
             fullWidth

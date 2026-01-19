@@ -2,24 +2,22 @@ import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, Linking, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLocale } from '@/contexts/LocaleContext';
+import { SUPPORTED_LANGUAGES } from '@/locales';
 import { Typography, Spacing } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useBiometric } from '@/hooks/useBiometric';
 import { api } from '@/services/api';
-import { ListSection, ListRow, Button } from '@/components';
-
-const CHECK_IN_INTERVALS: Record<number, string> = {
-  24: 'Alle 24 Stunden',
-  48: 'Alle 48 Stunden',
-  72: 'Alle 72 Stunden',
-  168: 'Einmal pro Woche',
-};
+import { ListSection, ListRow, Button, LanguageSelector } from '@/components';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
+  const { locale } = useLocale();
   const { user, logout, refreshUser } = useAuth();
   const { isEnabled: notificationsEnabled, isDndBypassed, registerNotifications, requestDndBypass } = useNotifications();
   const { hasHardware, isEnrolled, biometricType, isAppLockEnabled, setAppLockEnabled } = useBiometric();
@@ -27,13 +25,25 @@ export default function SettingsScreen() {
   const [isPaused, setIsPaused] = useState(user?.isPaused ?? false);
   const [pausedUntil, setPausedUntil] = useState(user?.pausedUntil ?? null);
   const [reminderEnabled, setReminderEnabled] = useState(user?.reminderEnabled ?? true);
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
+
+  // Get current language display name
+  const currentLanguage = SUPPORTED_LANGUAGES[locale]?.nativeName ?? locale;
 
   // Compute biometric label based on type
   const biometricLabel = biometricType === 'faceid'
     ? 'Face ID'
     : biometricType === 'touchid'
       ? 'Touch ID'
-      : 'Fingerabdruck';
+      : t('biometric.fingerprint');
+
+  // Check-in intervals with translations
+  const CHECK_IN_INTERVALS: Record<number, string> = {
+    24: t('settings.every24Hours'),
+    48: t('settings.every48Hours'),
+    72: t('settings.every72Hours'),
+    168: t('settings.everyWeek'),
+  };
 
   // Keep local state in sync with user object changes
   useEffect(() => {
@@ -49,12 +59,12 @@ export default function SettingsScreen() {
 
   const handlePause = async () => {
     Alert.alert(
-      '24h Pause',
-      'Möchtest du die Check-ins für 24 Stunden pausieren? Danach musst du dich wieder melden.',
+      t('settings.pause24h'),
+      t('settings.pauseConfirm'),
       [
-        { text: 'Abbrechen', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Pausieren',
+          text: t('settings.pause'),
           onPress: async () => {
             try {
               setIsPaused(true); // Optimistic
@@ -63,7 +73,7 @@ export default function SettingsScreen() {
               await refreshUser();
             } catch (error: any) {
               setIsPaused(false);
-              Alert.alert('Fehler', error.message || 'Pause konnte nicht aktiviert werden.');
+              Alert.alert(t('common.error'), error.message || t('errors.pauseFailed'));
             }
           }
         }
@@ -77,10 +87,10 @@ export default function SettingsScreen() {
       setPausedUntil(null);
       await api.updateProfile({ isPaused: false });
       await refreshUser();
-      Alert.alert('Willkommen zurück', 'Deine Pause wurde beendet.');
+      Alert.alert(t('settings.welcomeBack'), t('settings.pauseEnded'));
     } catch {
       setIsPaused(true);
-      Alert.alert('Fehler', 'Pause konnte nicht beendet werden.');
+      Alert.alert(t('common.error'), t('errors.resumeFailed'));
     }
   };
 
@@ -91,7 +101,7 @@ export default function SettingsScreen() {
       await refreshUser();
     } catch {
       setReminderEnabled(!value);
-      Alert.alert('Fehler', 'Einstellung konnte nicht gespeichert werden.');
+      Alert.alert(t('common.error'), t('errors.settingSaveFailed'));
     }
   };
 
@@ -99,34 +109,34 @@ export default function SettingsScreen() {
     try {
       const data = await api.exportData();
       Alert.alert(
-        'Daten exportiert',
-        'Deine Daten wurden erfolgreich exportiert.',
+        t('settings.dataExported'),
+        t('settings.dataExportedSuccess'),
         [
           {
-            text: 'Details anzeigen',
+            text: t('settings.showDetails'),
             onPress: () => {
               Alert.alert(
-                'Exportierte Daten',
+                t('settings.exportedData'),
                 JSON.stringify(data, null, 2).slice(0, 1000) + '...'
               );
             },
           },
-          { text: 'OK' },
+          { text: t('common.ok') },
         ]
       );
     } catch {
-      Alert.alert('Fehler', 'Daten konnten nicht exportiert werden.');
+      Alert.alert(t('common.error'), t('errors.exportFailed'));
     }
   };
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Konto löschen',
-      'Möchtest du dein Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden. Alle deine Daten werden unwiderruflich gelöscht.',
+      t('settings.deleteAccount'),
+      t('settings.deleteAccountConfirm'),
       [
-        { text: 'Abbrechen', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Konto löschen',
+          text: t('settings.deleteAccount'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -134,7 +144,7 @@ export default function SettingsScreen() {
               await logout();
               router.replace('/(auth)/welcome');
             } catch {
-              Alert.alert('Fehler', 'Konto konnte nicht gelöscht werden.');
+              Alert.alert(t('common.error'), t('errors.deleteAccountFailed'));
             }
           },
         },
@@ -149,7 +159,7 @@ export default function SettingsScreen() {
       // Navigate directly to welcome screen to avoid redirect race condition
       router.replace('/(auth)/welcome');
     } catch {
-      Alert.alert('Fehler', 'Abmeldung fehlgeschlagen.');
+      Alert.alert(t('common.error'), t('errors.logoutFailed'));
       setIsLoggingOut(false);
     }
   };
@@ -157,7 +167,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.text }]}>Einstellungen</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('settings.title')}</Text>
       </View>
 
       <ScrollView
@@ -166,11 +176,11 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Section */}
-        <ListSection title="Profil">
+        <ListSection title={t('settings.profile')}>
           <ListRow
             icon="person"
             iconColor="#007AFF"
-            title="Anzeigename"
+            title={t('settings.displayName')}
             value={user?.displayName}
             onPress={() => router.push('/(main)/edit-profile')}
           />
@@ -178,50 +188,50 @@ export default function SettingsScreen() {
 
         {/* Check-in Section */}
         <ListSection
-          title="Check-in"
+          title={t('settings.checkIn')}
           footer={
             isPaused
-              ? '⚠️ Check-in ist pausiert. Du erhältst keine Erinnerungen und deine Kontakte werden nicht benachrichtigt.'
+              ? t('settings.pausedWarning')
               : undefined
           }
         >
           <ListRow
             icon="time"
             iconColor="#FF9500"
-            title="Intervall"
+            title={t('settings.interval')}
             value={currentInterval}
             onPress={() => router.push('/(main)/edit-profile')}
           />
           <ListRow
             icon="pause-circle"
             iconColor={isPaused ? theme.warning : "#8E8E93"}
-            title={isPaused ? "Pause aktiv" : "24h Pause"}
+            title={isPaused ? t('settings.pauseActive') : t('settings.pause24h')}
             subtitle={
               isPaused && pausedUntil
-                ? `Endet ${new Date(pausedUntil).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} ${new Date(pausedUntil).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}`
-                : "Für 24 Stunden keine Check-ins"
+                ? t('settings.pauseEndsAt', { date: new Date(pausedUntil).toLocaleDateString(), time: new Date(pausedUntil).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })
+                : t('settings.noCheckInsFor24h')
             }
-            value={isPaused ? "Beenden" : undefined}
+            value={isPaused ? t('settings.endPause') : undefined}
             onPress={isPaused ? handleResume : handlePause}
           />
         </ListSection>
 
         {/* Notifications Section */}
         <ListSection
-          title="Benachrichtigungen"
+          title={t('settings.notifications')}
           footer={
             !notificationsEnabled
-              ? '⚠️ Benachrichtigungen sind deaktiviert. Aktiviere sie in den Einstellungen, um Notfall-Benachrichtigungen zu erhalten.'
+              ? t('settings.notificationsDisabledWarning')
               : Platform.OS === 'android' && !isDndBypassed
-                ? '⚠️ Kritische Benachrichtigungen können "Nicht stören" nicht umgehen. Aktiviere diese Berechtigung für maximale Zuverlässigkeit.'
-                : 'Benachrichtigungen sind aktiviert. Du wirst bei Notfällen benachrichtigt.'
+                ? t('settings.dndBypassWarning')
+                : t('settings.notificationsEnabled')
           }
         >
           <ListRow
             icon="notifications"
             iconColor={notificationsEnabled ? theme.success : theme.danger}
-            title="Push-Benachrichtigungen"
-            value={notificationsEnabled ? 'Aktiviert' : 'Deaktiviert'}
+            title={t('settings.pushNotifications')}
+            value={notificationsEnabled ? t('common.enabled') : t('common.disabled')}
             onPress={() => {
               if (!notificationsEnabled) {
                 registerNotifications();
@@ -234,9 +244,9 @@ export default function SettingsScreen() {
             <ListRow
               icon="volume-high"
               iconColor={isDndBypassed ? theme.success : theme.warning}
-              title="Kritische Benachrichtigungen"
-              subtitle='"Nicht stören" umgehen'
-              value={isDndBypassed ? 'Aktiviert' : 'Deaktiviert'}
+              title={t('settings.criticalNotifications')}
+              subtitle={t('settings.bypassDnd')}
+              value={isDndBypassed ? t('common.enabled') : t('common.disabled')}
               onPress={() => {
                 if (!isDndBypassed) {
                   requestDndBypass();
@@ -249,8 +259,8 @@ export default function SettingsScreen() {
           <ListRow
             icon="alarm"
             iconColor="#FF9500"
-            title="Erinnerungen"
-            subtitle="Vor Ablauf der Check-in-Frist"
+            title={t('settings.reminders')}
+            subtitle={t('settings.beforeDeadline')}
             switchValue={reminderEnabled}
             onSwitchChange={handleToggleReminder}
           />
@@ -259,13 +269,13 @@ export default function SettingsScreen() {
         {/* Security Section - Biometric Lock */}
         {hasHardware && isEnrolled && (
           <ListSection
-            title="Sicherheit"
-            footer="Schütze die App mit biometrischer Authentifizierung"
+            title={t('settings.security')}
+            footer={t('settings.biometricFooter')}
           >
             <ListRow
               icon="finger-print"
               iconColor="#5856D6"
-              title={`Mit ${biometricLabel} sperren`}
+              title={t('settings.lockWith', { type: biometricLabel })}
               switchValue={isAppLockEnabled}
               onSwitchChange={setAppLockEnabled}
             />
@@ -273,40 +283,47 @@ export default function SettingsScreen() {
         )}
 
         {/* Privacy Section */}
-        <ListSection title="Datenschutz">
+        <ListSection title={t('settings.privacy')}>
           <ListRow
             icon="document-text"
             iconColor="#5856D6"
-            title="Datenschutzerklärung"
+            title={t('settings.privacyPolicy')}
             onPress={() => Linking.openURL('https://allesgut.app/datenschutz')}
           />
           <ListRow
             icon="download"
             iconColor={theme.success}
-            title="Meine Daten exportieren"
+            title={t('settings.exportMyData')}
             onPress={handleExportData}
           />
           <ListRow
             icon="trash"
             iconColor="#FF3B30"
-            title="Konto löschen"
+            title={t('settings.deleteAccount')}
             destructive
             onPress={handleDeleteAccount}
           />
         </ListSection>
 
         {/* App Section */}
-        <ListSection title="App">
+        <ListSection title={t('settings.app')}>
+          <ListRow
+            icon="language"
+            iconColor="#34C759"
+            title={t('settings.language')}
+            value={currentLanguage}
+            onPress={() => setShowLanguageSelector(true)}
+          />
           <ListRow
             icon="information-circle"
             iconColor="#007AFF"
-            title="Über Alles Gut"
+            title={t('about.title')}
             onPress={() => router.push('/(main)/about')}
           />
           <ListRow
             icon="document"
             iconColor="#8E8E93"
-            title="Impressum"
+            title={t('settings.imprint')}
             onPress={() => Linking.openURL('https://allesgut.app/impressum')}
           />
         </ListSection>
@@ -314,7 +331,7 @@ export default function SettingsScreen() {
         {/* Logout */}
         <View style={styles.logoutContainer}>
           <Button
-            title={isLoggingOut ? 'Wird abgemeldet...' : 'Abmelden'}
+            title={isLoggingOut ? t('settings.loggingOut') : t('settings.logout')}
             variant="secondary"
             onPress={handleLogout}
             disabled={isLoggingOut}
@@ -323,9 +340,15 @@ export default function SettingsScreen() {
         </View>
 
         <Text style={[styles.version, { color: theme.textSecondary }]}>
-          Version 1.0.0
+          {t('settings.version', { version: '1.0.0' })}
         </Text>
       </ScrollView>
+
+      {/* Language Selector Modal */}
+      <LanguageSelector
+        visible={showLanguageSelector}
+        onClose={() => setShowLanguageSelector(false)}
+      />
     </SafeAreaView>
   );
 }

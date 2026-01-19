@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/colors';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,6 +18,7 @@ const CODE_LENGTH = 6;
 
 export default function VerifyScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { contactInfo, contactType } = useLocalSearchParams<{
     contactInfo: string;
     contactType: 'email' | 'phone';
@@ -71,7 +73,7 @@ export default function VerifyScreen() {
         router.replace('/');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ungültiger Code');
+      setError(err instanceof Error ? err.message : t('errors.invalidCode'));
       setCode('');
     } finally {
       setIsLoading(false);
@@ -88,7 +90,7 @@ export default function VerifyScreen() {
       await requestCode({ contactInfo, contactType: contactType || 'email' });
       setResendCooldown(60);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fehler beim Senden');
+      setError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
       setIsResending(false);
     }
@@ -103,8 +105,8 @@ export default function VerifyScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.title}>Bestätigungscode eingeben</Text>
-        <Text style={styles.subtitle}>Gesendet an:</Text>
+        <Text style={styles.title}>{t('auth.enterCode')}</Text>
+        <Text style={styles.subtitle}>{t('auth.codeSentTo')}</Text>
         <Text style={styles.contactInfo}>{contactInfo}</Text>
 
         <View style={styles.codeContainer}>
@@ -160,8 +162,8 @@ export default function VerifyScreen() {
               ]}
             >
               {resendCooldown > 0
-                ? `Code erneut senden (${resendCooldown}s)`
-                : 'Code erneut senden'}
+                ? t('auth.resendCodeCountdown', { seconds: resendCooldown })
+                : t('auth.resendCode')}
             </Text>
           )}
         </Pressable>
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: Typography.fontSize['2xl'],
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   content: {
     flex: 1,
@@ -195,7 +197,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.fontSize['2xl'],
     fontWeight: '600',
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.md,
   },
   subtitle: {
@@ -205,7 +207,7 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     fontSize: Typography.fontSize.lg,
-    color: Colors.textPrimary,
+    color: Colors.text,
     fontWeight: '500',
     marginBottom: Spacing.xl,
   },
@@ -233,7 +235,7 @@ const styles = StyleSheet.create({
   codeDigit: {
     fontSize: Typography.fontSize['2xl'],
     fontWeight: '600',
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   hiddenInput: {
     position: 'absolute',

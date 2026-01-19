@@ -89,7 +89,6 @@ export async function checkDndPermission(): Promise<boolean> {
   const criticalChannel = channels.find(c => c.id === CRITICAL_CHANNEL_ID);
 
   // Check if the channel exists and has bypassDnd enabled
-  // @ts-expect-error - bypassDnd is an Android-specific property
   return criticalChannel?.bypassDnd === true;
 }
 
@@ -246,7 +245,7 @@ export async function scheduleTestNotification(): Promise<void> {
 
 // No-op subscription for when notifications aren't supported
 const noOpSubscription: Notifications.EventSubscription = {
-  remove: () => {},
+  remove: () => { },
 };
 
 /**

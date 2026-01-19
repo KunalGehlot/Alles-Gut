@@ -11,6 +11,7 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { useAuth } from '@/hooks/useAuth';
@@ -22,6 +23,7 @@ type Step = 'select-method' | 'enter-contact';
 export default function RegisterScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const { requestCode } = useAuth();
   const [step, setStep] = useState<Step>('select-method');
   const [contactType, setContactType] = useState<ContactType>('email');
@@ -36,7 +38,7 @@ export default function RegisterScreen() {
 
   const handleRequestCode = async () => {
     if (!contactInfo.trim()) {
-      setError('Bitte gib deine E-Mail-Adresse ein.');
+      setError(t('validation.emailRequired'));
       return;
     }
 
@@ -50,7 +52,7 @@ export default function RegisterScreen() {
         params: { contactInfo: contactInfo.trim(), contactType },
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten.');
+      setError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +85,7 @@ export default function RegisterScreen() {
         {step === 'select-method' ? (
           <View style={styles.content}>
             <Text style={[styles.title, { color: theme.text }]}>
-              Wie möchtest du dich registrieren?
+              {t('auth.howToRegister')}
             </Text>
 
             <View style={styles.optionsContainer}>
@@ -99,7 +101,7 @@ export default function RegisterScreen() {
                   <Ionicons name="mail" size={24} color="#FFFFFF" />
                 </View>
                 <Text style={[styles.optionText, { color: theme.text }]}>
-                  Mit E-Mail
+                  {t('auth.withEmail')}
                 </Text>
                 <Ionicons name="chevron-forward" size={20} color={theme.textTertiary} />
               </Pressable>
@@ -115,7 +117,7 @@ export default function RegisterScreen() {
                   <Ionicons name="phone-portrait" size={24} color="#FFFFFF" />
                 </View>
                 <Text style={[styles.optionText, { color: theme.textSecondary }]}>
-                  Mit Handynummer (bald)
+                  {t('auth.withPhone')} (soon)
                 </Text>
               </Pressable>
             </View>
@@ -123,14 +125,14 @@ export default function RegisterScreen() {
             <View style={[styles.infoBox, { backgroundColor: theme.surfaceSecondary }]}>
               <Ionicons name="information-circle" size={20} color={theme.textSecondary} />
               <Text style={[styles.infoText, { color: theme.textSecondary }]}>
-                Wir senden dir einen Bestätigungscode. Kein Passwort nötig.
+                {t('auth.sendCodeInfo')}
               </Text>
             </View>
           </View>
         ) : (
           <View style={styles.content}>
             <Text style={[styles.title, { color: theme.text }]}>
-              Deine E-Mail-Adresse
+              {t('auth.enterEmail')}
             </Text>
 
             <TextInput
@@ -160,7 +162,7 @@ export default function RegisterScreen() {
             )}
 
             <Button
-              title={isLoading ? 'Wird gesendet...' : 'Code anfordern'}
+              title={isLoading ? t('common.loading') : t('auth.requestCode')}
               onPress={handleRequestCode}
               disabled={isLoading}
               loading={isLoading}
@@ -171,8 +173,7 @@ export default function RegisterScreen() {
             <View style={[styles.privacyNote, { backgroundColor: theme.surfaceSecondary }]}>
               <Ionicons name="lock-closed" size={18} color={theme.textSecondary} />
               <Text style={[styles.privacyText, { color: theme.textSecondary }]}>
-                Deine E-Mail wird verschlüsselt gespeichert und nur für die
-                Anmeldung und Notfall-Benachrichtigungen verwendet.
+                {t('auth.emailPrivacyNote')}
               </Text>
             </View>
           </View>

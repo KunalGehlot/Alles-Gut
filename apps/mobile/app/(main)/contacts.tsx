@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import QRCode from 'react-native-qrcode-svg';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { useContacts } from '@/hooks/useContacts';
@@ -27,6 +28,7 @@ const MAX_CONTACTS = 5;
 export default function ContactsScreen() {
   const router = useRouter();
   const { theme, isDark } = useTheme();
+  const { t } = useTranslation();
   const { contacts, isLoading, removeContact, createInvitation } = useContacts();
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [invitation, setInvitation] = useState<CreateInvitationResponse | null>(null);
@@ -43,7 +45,7 @@ export default function ContactsScreen() {
       setShowInviteModal(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch {
-      Alert.alert('Fehler', 'Einladung konnte nicht erstellt werden.');
+      Alert.alert(t('common.error'), t('errors.inviteCreateFailed'));
     } finally {
       setIsCreatingInvite(false);
     }
@@ -53,14 +55,14 @@ export default function ContactsScreen() {
     if (invitation?.inviteLink) {
       await Clipboard.setStringAsync(invitation.inviteLink);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert('Kopiert', 'Link wurde in die Zwischenablage kopiert.');
+      Alert.alert(t('contacts.copied'), t('contacts.linkCopied'));
     }
   };
 
   const handleShareLink = async () => {
     if (invitation?.inviteLink) {
       await Share.share({
-        message: `Ich möchte dich als Notfallkontakt in der Alles Gut App hinzufügen. Bitte installiere die App und nutze diesen Link: ${invitation.inviteLink}`,
+        message: t('contacts.shareMessage', { link: invitation.inviteLink }),
       });
     }
   };
@@ -68,12 +70,12 @@ export default function ContactsScreen() {
   const handleRemoveContact = (contact: ContactWithDetails) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
-      'Kontakt entfernen',
-      `Möchtest du ${contact.displayName} wirklich als Notfallkontakt entfernen?`,
+      t('contacts.removeContact'),
+      t('contacts.removeConfirm', { name: contact.displayName }),
       [
-        { text: 'Abbrechen', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Entfernen',
+          text: t('common.remove'),
           style: 'destructive',
           onPress: () => removeContact(contact.id),
         },
@@ -109,14 +111,14 @@ export default function ContactsScreen() {
             <>
               <Ionicons name="checkmark-circle" size={14} color={theme.success} />
               <Text style={[styles.statusText, { color: theme.textSecondary }]}>
-                Aktiv · {formatDate(item.createdAt)}
+                {t('contacts.active')} · {formatDate(item.createdAt)}
               </Text>
             </>
           ) : (
             <>
               <Ionicons name="time" size={14} color={theme.warning} />
               <Text style={[styles.statusText, { color: theme.textSecondary }]}>
-                Einladung ausstehend
+                {t('contacts.invitePending')}
               </Text>
             </>
           )}
@@ -139,12 +141,12 @@ export default function ContactsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: theme.text }]}>Kontakte</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('contacts.title')}</Text>
       </View>
 
       <View style={styles.content}>
         <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
-          Notfallkontakte ({activeContacts.length + pendingContacts.length}/{MAX_CONTACTS})
+          {t('contacts.emergencyContacts')} ({activeContacts.length + pendingContacts.length}/{MAX_CONTACTS})
         </Text>
 
         {contacts.length === 0 ? (
@@ -153,10 +155,10 @@ export default function ContactsScreen() {
               <Ionicons name="people-outline" size={48} color={theme.textSecondary} />
             </View>
             <Text style={[styles.emptyTitle, { color: theme.text }]}>
-              Keine Kontakte
+              {t('contacts.noContacts')}
             </Text>
             <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-              Füge Notfallkontakte hinzu, die benachrichtigt werden, wenn du dich nicht meldest.
+              {t('contacts.addContactsHint')}
             </Text>
           </View>
         ) : (
@@ -173,7 +175,7 @@ export default function ContactsScreen() {
         <View style={styles.buttonContainer}>
           {contacts.length < MAX_CONTACTS && (
             <Button
-              title={isCreatingInvite ? 'Erstelle Einladung...' : 'Kontakt einladen'}
+              title={isCreatingInvite ? t('contacts.creatingInvite') : t('contacts.inviteContact')}
               onPress={handleCreateInvite}
               disabled={isCreatingInvite}
               loading={isCreatingInvite}
@@ -181,7 +183,7 @@ export default function ContactsScreen() {
             />
           )}
           <Button
-            title="Einladung annehmen"
+            title={t('contacts.acceptInvite')}
             variant="secondary"
             onPress={() => router.push('/(main)/accept-invite')}
             fullWidth
@@ -205,14 +207,14 @@ export default function ContactsScreen() {
               <Ionicons name="close" size={28} color={theme.text} />
             </Pressable>
             <Text style={[styles.modalTitle, { color: theme.text }]}>
-              Kontakt einladen
+              {t('contacts.inviteContact')}
             </Text>
             <View style={styles.closeButton} />
           </View>
 
           <View style={styles.modalContent}>
             <Text style={[styles.modalDescription, { color: theme.textSecondary }]}>
-              Teile diesen Link oder QR-Code mit der Person, die dich im Notfall benachrichtigt werden soll.
+              {t('contacts.shareQrOrLink')}
             </Text>
 
             <View style={[styles.qrContainer, { backgroundColor: '#FFFFFF' }]}>
@@ -229,7 +231,7 @@ export default function ContactsScreen() {
             <View style={styles.dividerContainer}>
               <View style={[styles.divider, { backgroundColor: theme.separator }]} />
               <Text style={[styles.dividerText, { color: theme.textSecondary }]}>
-                ODER
+                {t('common.or')}
               </Text>
               <View style={[styles.divider, { backgroundColor: theme.separator }]} />
             </View>
@@ -245,7 +247,7 @@ export default function ContactsScreen() {
               <Ionicons name="copy-outline" size={24} color={theme.primary} />
               <View style={styles.linkInfo}>
                 <Text style={[styles.linkLabel, { color: theme.text }]}>
-                  Link kopieren
+                  {t('contacts.copyLink')}
                 </Text>
                 <Text
                   style={[styles.linkUrl, { color: theme.textSecondary }]}
@@ -257,7 +259,7 @@ export default function ContactsScreen() {
             </Pressable>
 
             <Button
-              title="Link teilen"
+              title={t('contacts.shareLink')}
               onPress={handleShareLink}
               fullWidth
               style={{ marginTop: Spacing.md }}
@@ -266,7 +268,7 @@ export default function ContactsScreen() {
             <View style={styles.validityNote}>
               <Ionicons name="information-circle" size={18} color={theme.textSecondary} />
               <Text style={[styles.validityText, { color: theme.textSecondary }]}>
-                Der Link ist 7 Tage gültig
+                {t('contacts.linkValid7Days')}
               </Text>
             </View>
           </View>

@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, Linking, Pressable } from 'react-na
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { ListSection, ListRow } from '@/components';
@@ -9,6 +10,7 @@ import { ListSection, ListRow } from '@/components';
 export default function AboutScreen() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
@@ -16,7 +18,7 @@ export default function AboutScreen() {
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={28} color={theme.primary} />
         </Pressable>
-        <Text style={[styles.title, { color: theme.text }]}>Über Alles Gut</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('about.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -29,71 +31,69 @@ export default function AboutScreen() {
           <View style={[styles.iconContainer, { backgroundColor: theme.primary }]}>
             <Ionicons name="heart" size={48} color="#FFFFFF" />
           </View>
-          <Text style={[styles.appName, { color: theme.text }]}>Alles Gut</Text>
+          <Text style={[styles.appName, { color: theme.text }]}>{t('app.name')}</Text>
           <Text style={[styles.appVersion, { color: theme.textSecondary }]}>
-            Version 1.0.0
+            {t('settings.version', { version: '1.0.0' })}
           </Text>
         </View>
 
         {/* Description */}
         <View style={[styles.descriptionCard, { backgroundColor: theme.surface }]}>
           <Text style={[styles.description, { color: theme.text }]}>
-            Alles Gut ist deine persönliche Sicherheits-App. Mit regelmäßigen Check-ins
-            gibst du deinen Liebsten ein gutes Gefühl - und sie werden automatisch
-            benachrichtigt, falls du dich nicht meldest.
+            {t('about.description')}
           </Text>
         </View>
 
         {/* Features */}
-        <ListSection title="Funktionen">
+        <ListSection title={t('about.features')}>
           <ListRow
             icon="shield-checkmark"
             iconColor={theme.success}
-            title="Sichere Check-ins"
-            subtitle="Einfaches Bestätigen mit einem Tap"
+            title={t('about.secureCheckIns')}
+            subtitle={t('about.simpleConfirmation')}
             showChevron={false}
           />
           <ListRow
             icon="people"
             iconColor="#007AFF"
-            title="Notfallkontakte"
-            subtitle="Bis zu 5 vertrauenswürdige Personen"
+            title={t('about.emergencyContacts')}
+            subtitle={t('about.upTo5Contacts')}
             showChevron={false}
           />
           <ListRow
             icon="lock-closed"
             iconColor="#5856D6"
-            title="Ende-zu-Ende verschlüsselt"
-            subtitle="Deine Daten bleiben privat"
+            title={t('about.endToEndEncrypted')}
+            subtitle={t('about.dataStaysPrivate')}
             showChevron={false}
           />
           <ListRow
             icon="globe"
             iconColor="#FF9500"
-            title="DSGVO-konform"
-            subtitle="Made in Germany"
+            title={t('about.gdprCompliant')}
+            subtitle={t('about.madeInGermany')}
             showChevron={false}
           />
         </ListSection>
 
         {/* Links */}
-        <ListSection title="Links">
+        <ListSection title={t('about.links')}>
           <ListRow
             icon="globe-outline"
             iconColor="#007AFF"
-            title="Website"
+            title={t('about.website')}
             onPress={() => Linking.openURL('https://allesgut.app')}
           />
           <ListRow
             icon="document-text-outline"
             iconColor="#5856D6"
-            title="Datenschutzerklärung"
+            title={t('settings.privacyPolicy')}
             onPress={() => Linking.openURL('https://allesgut.app/datenschutz')}
           />
           <ListRow
             icon="document-outline"
             iconColor="#8E8E93"
-            title="Nutzungsbedingungen"
+            title={t('about.termsOfService')}
             onPress={() => Linking.openURL('https://allesgut.app/agb')}
           />
         </ListSection>
@@ -101,10 +101,10 @@ export default function AboutScreen() {
         {/* Credits */}
         <View style={styles.credits}>
           <Text style={[styles.creditsText, { color: theme.textSecondary }]}>
-            Mit ❤️ entwickelt in Deutschland
+            {t('about.madeWithLove')}
           </Text>
           <Text style={[styles.creditsText, { color: theme.textTertiary }]}>
-            © 2024 Alles Gut
+            {t('about.copyright')}
           </Text>
         </View>
       </ScrollView>

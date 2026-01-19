@@ -10,22 +10,24 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { Colors } from '@/constants/colors';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 
 export default function SetupNameScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const handleContinue = () => {
     const name = displayName.trim();
     if (!name) {
-      setError('Bitte gib einen Namen ein.');
+      setError(t('validation.nameRequired'));
       return;
     }
     if (name.length < 2) {
-      setError('Der Name muss mindestens 2 Zeichen lang sein.');
+      setError(t('validation.nameTooShort'));
       return;
     }
 
@@ -49,7 +51,7 @@ export default function SetupNameScreen() {
 
         <View style={styles.content}>
           <Text style={styles.title}>
-            Wie sollen dich deine Kontakte sehen?
+            {t('auth.displayNameQuestion')}
           </Text>
 
           <TextInput
@@ -71,7 +73,7 @@ export default function SetupNameScreen() {
           <View style={styles.infoBox}>
             <Text style={styles.infoIcon}>&#x2139;</Text>
             <Text style={styles.infoText}>
-              Du kannst einen Spitznamen oder deinen echten Namen verwenden.
+              {t('auth.displayNameHint')}
             </Text>
           </View>
 
@@ -83,7 +85,7 @@ export default function SetupNameScreen() {
               ]}
               onPress={handleContinue}
             >
-              <Text style={styles.primaryButtonText}>Weiter</Text>
+              <Text style={styles.primaryButtonText}>{t('auth.continue')}</Text>
             </Pressable>
           </View>
         </View>
@@ -109,7 +111,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: Typography.fontSize['2xl'],
-    color: Colors.textPrimary,
+    color: Colors.text,
   },
   content: {
     flex: 1,
@@ -119,7 +121,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Typography.fontSize['2xl'],
     fontWeight: '600',
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.xl,
     lineHeight: Typography.lineHeight['2xl'],
   },
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
     fontSize: Typography.fontSize.xl,
-    color: Colors.textPrimary,
+    color: Colors.text,
     marginBottom: Spacing.lg,
   },
   inputError: {

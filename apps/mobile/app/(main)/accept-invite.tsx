@@ -13,6 +13,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
 import { api } from '@/services/api';
@@ -22,6 +23,7 @@ export default function AcceptInviteScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ code?: string }>();
   const { theme } = useTheme();
+  const { t } = useTranslation();
 
   const [permission, requestPermission] = useCameraPermissions();
   const [manualCode, setManualCode] = useState(params.code ?? '');
@@ -45,17 +47,17 @@ export default function AcceptInviteScreen() {
       await api.acceptInvitation({ inviteCode: code.trim() });
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(
-        'Einladung angenommen',
-        'Du wurdest erfolgreich als Kontakt hinzugefügt.',
-        [{ text: 'OK', onPress: () => router.back() }]
+        t('acceptInvite.inviteAccepted'),
+        t('acceptInvite.successMessage'),
+        [{ text: t('common.ok'), onPress: () => router.back() }]
       );
     } catch (error: unknown) {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       const message =
         error instanceof Error
           ? error.message
-          : 'Die Einladung konnte nicht angenommen werden.';
-      Alert.alert('Fehler', message);
+          : t('acceptInvite.couldNotAccept');
+      Alert.alert(t('common.error'), message);
       setScanned(false);
     } finally {
       setIsProcessing(false);
@@ -98,7 +100,7 @@ export default function AcceptInviteScreen() {
         <Pressable onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={28} color={theme.primary} />
         </Pressable>
-        <Text style={[styles.title, { color: theme.text }]}>Einladung annehmen</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t('acceptInvite.title')}</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -120,13 +122,13 @@ export default function AcceptInviteScreen() {
               {isProcessing && (
                 <View style={styles.processingOverlay}>
                   <ActivityIndicator size="large" color="#FFFFFF" />
-                  <Text style={styles.processingText}>Wird verarbeitet...</Text>
+                  <Text style={styles.processingText}>{t('common.processing')}</Text>
                 </View>
               )}
             </View>
 
             <Text style={[styles.instructions, { color: theme.textSecondary }]}>
-              Scanne den QR-Code deines Kontakts
+              {t('acceptInvite.scanQrCode')}
             </Text>
 
             <Pressable
@@ -134,7 +136,7 @@ export default function AcceptInviteScreen() {
               style={styles.manualLink}
             >
               <Text style={[styles.manualLinkText, { color: theme.primary }]}>
-                Code manuell eingeben
+                {t('acceptInvite.enterCodeManually')}
               </Text>
             </Pressable>
           </>
@@ -142,13 +144,13 @@ export default function AcceptInviteScreen() {
           <View style={styles.permissionContainer}>
             <Ionicons name="camera-outline" size={64} color={theme.textSecondary} />
             <Text style={[styles.permissionTitle, { color: theme.text }]}>
-              Kamera-Zugriff benötigt
+              {t('acceptInvite.cameraRequired')}
             </Text>
             <Text style={[styles.permissionText, { color: theme.textSecondary }]}>
-              Um QR-Codes zu scannen, benötigt die App Zugriff auf deine Kamera.
+              {t('acceptInvite.cameraPermissionText')}
             </Text>
             <Button
-              title="Kamera erlauben"
+              title={t('acceptInvite.allowCamera')}
               onPress={requestPermission}
               style={{ marginTop: Spacing.lg }}
             />
@@ -157,17 +159,17 @@ export default function AcceptInviteScreen() {
               style={styles.manualLink}
             >
               <Text style={[styles.manualLinkText, { color: theme.primary }]}>
-                Code manuell eingeben
+                {t('acceptInvite.enterCodeManually')}
               </Text>
             </Pressable>
           </View>
         ) : (
           <View style={styles.manualContainer}>
             <Text style={[styles.manualTitle, { color: theme.text }]}>
-              Einladungscode eingeben
+              {t('acceptInvite.enterInviteCode')}
             </Text>
             <Text style={[styles.manualDescription, { color: theme.textSecondary }]}>
-              Gib den Code ein, den du von deinem Kontakt erhalten hast.
+              {t('acceptInvite.enterCodeDescription')}
             </Text>
 
             <View style={[styles.inputContainer, { backgroundColor: theme.surface }]}>
@@ -175,7 +177,7 @@ export default function AcceptInviteScreen() {
                 style={[styles.input, { color: theme.text }]}
                 value={manualCode}
                 onChangeText={setManualCode}
-                placeholder="z.B. ABC123XYZ"
+                placeholder={t('acceptInvite.codePlaceholder')}
                 placeholderTextColor={theme.textTertiary}
                 autoCapitalize="characters"
                 autoCorrect={false}
@@ -184,7 +186,7 @@ export default function AcceptInviteScreen() {
             </View>
 
             <Button
-              title={isProcessing ? 'Wird verarbeitet...' : 'Einladung annehmen'}
+              title={isProcessing ? t('common.processing') : t('acceptInvite.title')}
               onPress={handleManualSubmit}
               disabled={!manualCode.trim() || isProcessing}
               fullWidth
@@ -200,7 +202,7 @@ export default function AcceptInviteScreen() {
                 style={styles.manualLink}
               >
                 <Text style={[styles.manualLinkText, { color: theme.primary }]}>
-                  QR-Code scannen
+                  {t('acceptInvite.scanQrCodeButton')}
                 </Text>
               </Pressable>
             )}
