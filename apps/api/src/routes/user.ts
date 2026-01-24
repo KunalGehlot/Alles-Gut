@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import { db } from '../db/client.js';
 import { encrypt, decrypt } from '../services/encryption.js';
+import { exportUserData } from '../services/export.js';
 import { authMiddleware, AuthenticatedRequest } from '../middleware/auth.js';
 
 const router = Router();
@@ -250,88 +251,14 @@ router.get('/export', async (req: Request, res: Response) => {
   try {
     const { userId } = req as AuthenticatedRequest;
 
-    // Get user data
-    const userResult = await db.query<{
-      id: string;
-      encrypted_display_name: Buffer;
-      encrypted_contact_info: Buffer;
-      contact_type: string;
-      check_in_interval_hours: number;
-      grace_period_hours: number;
-      is_paused: boolean;
-      last_check_in: Date | null;
-      next_deadline: Date | null;
-      created_at: Date;
-    }>(
-      `SELECT id, encrypted_display_name, encrypted_contact_info, contact_type,
-              check_in_interval_hours, grace_period_hours, is_paused,
-              last_check_in, next_deadline, created_at
-       FROM users WHERE id = $1`,
-      [userId]
-    );
-
-    if (userResult.rows.length === 0) {
+    // Use the comprehensive export service
+    const exportData = await exportUserData(userId);
+    res.json(exportData);
+  } catch (error) {
+    if (error instanceof Error && error.message === 'User not found') {
       res.status(404).json({ error: 'Not Found', message: 'User not found' });
       return;
     }
-
-    const user = userResult.rows[0];
-
-    // Get check-in history
-    const checkInsResult = await db.query<{ checked_in_at: Date }>(
-      'SELECT checked_in_at FROM check_ins WHERE user_id = $1 ORDER BY checked_in_at DESC',
-      [userId]
-    );
-
-    // Get contacts
-    const contactsResult = await db.query<{
-      id: string;
-      status: string;
-      created_at: Date;
-    }>(
-      'SELECT id, status, created_at FROM contacts WHERE user_id = $1',
-      [userId]
-    );
-
-    // Get alerts
-    const alertsResult = await db.query<{
-      triggered_at: Date;
-      notified_contacts: string[];
-    }>(
-      'SELECT triggered_at, notified_contacts FROM alerts WHERE user_id = $1 ORDER BY triggered_at DESC',
-      [userId]
-    );
-
-    const exportData = {
-      user: {
-        id: user.id,
-        displayName: decrypt(user.encrypted_display_name, userId),
-        contactInfo: decrypt(user.encrypted_contact_info, userId),
-        contactType: user.contact_type,
-        checkInIntervalHours: user.check_in_interval_hours,
-        gracePeriodHours: user.grace_period_hours,
-        isPaused: user.is_paused,
-        lastCheckIn: user.last_check_in?.toISOString() ?? null,
-        nextDeadline: user.next_deadline?.toISOString() ?? null,
-        createdAt: user.created_at.toISOString(),
-      },
-      checkIns: checkInsResult.rows.map(c => ({
-        checkedInAt: c.checked_in_at.toISOString(),
-      })),
-      contacts: contactsResult.rows.map(c => ({
-        id: c.id,
-        status: c.status,
-        createdAt: c.created_at.toISOString(),
-      })),
-      alerts: alertsResult.rows.map(a => ({
-        triggeredAt: a.triggered_at.toISOString(),
-        notifiedContactsCount: a.notified_contacts.length,
-      })),
-      exportedAt: new Date().toISOString(),
-    };
-
-    res.json(exportData);
-  } catch (error) {
     console.error('Export user data error:', error);
     res.status(500).json({ error: 'Internal Server Error', message: 'Failed to export data' });
   }

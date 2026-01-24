@@ -38,6 +38,8 @@ export const db = {
   end: () => pool.end(),
 };
 
+export const query = db.query;
+
 export async function initializeDatabase(): Promise<void> {
   try {
     // Test connection

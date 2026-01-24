@@ -11,6 +11,7 @@ import userRoutes from './routes/user.js';
 import checkinRoutes from './routes/checkin.js';
 import contactsRoutes from './routes/contacts.js';
 import notificationsRoutes from './routes/notifications.js';
+import { analyticsRouter } from './routes/analytics.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +35,7 @@ app.use('/user', userRoutes);
 app.use('/checkin', checkinRoutes);
 app.use('/contacts', contactsRoutes);
 app.use('/notifications', notificationsRoutes);
+app.use('/analytics', analyticsRouter);
 
 // 404 handler
 app.use((_req, res) => {
