@@ -52,7 +52,16 @@
     "onlyHoursLeft": "Only {{hours}} hours left!",
     "checkInPaused": "Check-in is paused",
     "noCheckInYet": "No check-in yet",
-    "notificationWarning": "Notification after 48 hours without check-in"
+    "notificationWarning": "Notification after 48 hours without check-in",
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "lastCheckInLabel": "Last Check-In",
+    "checkInSuccess": "Sign of life sent!",
+    "warningCheckInSoon": "Please check in soon!",
+    "connectionError": "Connection error",
+    "retry": "Retry",
+    "notificationAfterHours": "Notification after 48 hours without check-in"
   },
   "contacts": {
     "title": "Contacts",
@@ -74,7 +83,18 @@
     "removeConfirm": "Do you really want to remove {{name}} as an emergency contact?",
     "noContacts": "No contacts",
     "addContactsHint": "Add emergency contacts who will be notified if you don't check in.",
-    "shareMessage": "I want to add you as an emergency contact in the Alles Gut app. Please install the app and use this link: {{link}}"
+    "shareMessage": "I want to add you as an emergency contact in the Alles Gut app. Please install the app and use this link: {{link}}",
+    "pending": "Invitation pending",
+    "inviteTitle": "Invite contact",
+    "inviteDescription": "Share this link or QR code with the person who should be notified in an emergency.",
+    "or": "OR",
+    "linkValidFor": "The link is valid for 7 days",
+    "linkCopiedMessage": "Link copied to clipboard.",
+    "remove": "Remove",
+    "noContactsDescription": "Add emergency contacts who will be notified if you don't check in.",
+    "invitationAccepted": "Invitation accepted",
+    "invitationAcceptedMessage": "You have been successfully added as a contact.",
+    "invitationFailed": "The invitation could not be accepted."
   },
   "settings": {
     "title": "Settings",
@@ -133,7 +153,32 @@
     "logout": "Log out",
     "loggingOut": "Logging out...",
     "discardChanges": "Discard changes?",
-    "discardChangesMessage": "You have unsaved changes. Do you really want to go back?"
+    "discardChangesMessage": "You have unsaved changes. Do you really want to go back?",
+    "pauseSubtitle": "No check-ins for 24 hours",
+    "pauseSubtitleActive": "No check-ins for 24 hours",
+    "pauseConfirmTitle": "24h Pause",
+    "pauseConfirmMessage": "Do you want to pause check-ins for 24 hours? After that, you will need to check in again.",
+    "pauseButton": "Pause",
+    "resumeButton": "End",
+    "pauseResumedTitle": "Welcome back",
+    "pauseResumedMessage": "Your pause has been ended.",
+    "checkInPausedWarning": "Check-in is paused. You won't receive reminders and your contacts won't be notified.",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "criticalNotificationsSubtitle": "Bypass \"Do not disturb\"",
+    "notificationsEnabledMessage": "Notifications are enabled. You will be notified in emergencies.",
+    "criticalNotificationsWarning": "Critical notifications cannot bypass \"Do not disturb\". Enable this permission for maximum reliability.",
+    "remindersSubtitle": "Before check-in deadline",
+    "emailBackup": "Email backup",
+    "lockWithBiometric": "Lock with {{biometric}}",
+    "exportData": "Export my data",
+    "exportDataSuccess": "Data exported",
+    "exportDataSuccessMessage": "Your data has been exported successfully.",
+    "exportDataDetails": "Show details",
+    "deleteConfirmTitle": "Delete account",
+    "deleteConfirm": "Do you really want to delete your account? This action cannot be undone. All your data will be permanently deleted.",
+    "deleteButton": "Delete account",
+    "about": "About Alles Gut"
   },
   "about": {
     "title": "About Alles Gut",
@@ -151,7 +196,11 @@
     "website": "Website",
     "termsOfService": "Terms of service",
     "madeWithLove": "Made with ❤️ in Germany",
-    "copyright": "© 2024 Alles Gut"
+    "copyright": "© 2024 Alles Gut",
+    "secureCheckInsSubtitle": "Simple confirmation with one tap",
+    "emergencyContactsSubtitle": "Up to 5 trusted people",
+    "endToEndEncryptedSubtitle": "Your data stays private",
+    "gdprCompliantSubtitle": "Made in Germany"
   },
   "acceptInvite": {
     "title": "Accept invitation",
@@ -166,7 +215,12 @@
     "couldNotAccept": "The invitation could not be accepted.",
     "cameraRequired": "Camera access required",
     "cameraPermissionText": "To scan QR codes, the app needs access to your camera.",
-    "allowCamera": "Allow camera"
+    "allowCamera": "Allow camera",
+    "enterCodeTitle": "Enter invitation code",
+    "acceptButton": "Accept invitation",
+    "processing": "Processing...",
+    "cameraPermissionTitle": "Camera access required",
+    "cameraPermissionMessage": "To scan QR codes, the app needs access to your camera."
   },
   "lockScreen": {
     "appLocked": "App is locked",
@@ -233,7 +287,14 @@
     "deleteAccountFailed": "Account could not be deleted.",
     "logoutFailed": "Logout failed.",
     "inviteCreateFailed": "Invitation could not be created.",
-    "profileSaveFailed": "Profile could not be saved."
+    "profileSaveFailed": "Profile could not be saved.",
+    "couldNotSave": "Setting could not be saved.",
+    "couldNotPause": "Pause could not be activated.",
+    "couldNotResume": "Pause could not be ended.",
+    "couldNotExport": "Data could not be exported.",
+    "couldNotDelete": "Account could not be deleted.",
+    "couldNotLogout": "Logout failed.",
+    "couldNotCreateInvite": "Invitation could not be created."
   },
   "validation": {
     "emailRequired": "Please enter your email address.",

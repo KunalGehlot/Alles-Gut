@@ -52,7 +52,16 @@
     "onlyHoursLeft": "Nur noch {{hours}} Stunden!",
     "checkInPaused": "Check-in ist pausiert",
     "noCheckInYet": "Noch kein Check-In",
-    "notificationWarning": "Benachrichtigung nach 48 Stunden ohne Check-In"
+    "notificationWarning": "Benachrichtigung nach 48 Stunden ohne Check-In",
+    "greetingMorning": "Guten Morgen",
+    "greetingAfternoon": "Guten Tag",
+    "greetingEvening": "Guten Abend",
+    "lastCheckInLabel": "Letzter Check-In",
+    "checkInSuccess": "Lebenszeichen gesendet!",
+    "warningCheckInSoon": "Bitte melde dich bald!",
+    "connectionError": "Verbindungsfehler",
+    "retry": "Erneut versuchen",
+    "notificationAfterHours": "Benachrichtigung nach 48 Stunden ohne Check-In"
   },
   "contacts": {
     "title": "Kontakte",
@@ -74,7 +83,18 @@
     "removeConfirm": "Möchtest du {{name}} wirklich als Notfallkontakt entfernen?",
     "noContacts": "Keine Kontakte",
     "addContactsHint": "Füge Notfallkontakte hinzu, die benachrichtigt werden, wenn du dich nicht meldest.",
-    "shareMessage": "Ich möchte dich als Notfallkontakt in der Alles Gut App hinzufügen. Bitte installiere die App und nutze diesen Link: {{link}}"
+    "shareMessage": "Ich möchte dich als Notfallkontakt in der Alles Gut App hinzufügen. Bitte installiere die App und nutze diesen Link: {{link}}",
+    "pending": "Einladung ausstehend",
+    "inviteTitle": "Kontakt einladen",
+    "inviteDescription": "Teile diesen Link oder QR-Code mit der Person, die im Notfall benachrichtigt werden soll.",
+    "or": "ODER",
+    "linkValidFor": "Der Link ist 7 Tage gültig",
+    "linkCopiedMessage": "Link wurde in die Zwischenablage kopiert.",
+    "remove": "Entfernen",
+    "noContactsDescription": "Füge Notfallkontakte hinzu, die benachrichtigt werden, wenn du dich nicht meldest.",
+    "invitationAccepted": "Einladung angenommen",
+    "invitationAcceptedMessage": "Du wurdest erfolgreich als Kontakt hinzugefügt.",
+    "invitationFailed": "Die Einladung konnte nicht angenommen werden."
   },
   "settings": {
     "title": "Einstellungen",
@@ -133,7 +153,32 @@
     "logout": "Abmelden",
     "loggingOut": "Wird abgemeldet...",
     "discardChanges": "Änderungen verwerfen?",
-    "discardChangesMessage": "Du hast ungespeicherte Änderungen. Möchtest du wirklich zurück?"
+    "discardChangesMessage": "Du hast ungespeicherte Änderungen. Möchtest du wirklich zurück?",
+    "pauseSubtitle": "Keine Check-ins für 24 Stunden",
+    "pauseSubtitleActive": "Keine Check-ins für 24 Stunden",
+    "pauseConfirmTitle": "24h Pause",
+    "pauseConfirmMessage": "Möchtest du die Check-ins für 24 Stunden pausieren? Danach musst du dich wieder melden.",
+    "pauseButton": "Pausieren",
+    "resumeButton": "Beenden",
+    "pauseResumedTitle": "Willkommen zurück",
+    "pauseResumedMessage": "Deine Pause wurde beendet.",
+    "checkInPausedWarning": "Check-in ist pausiert. Du erhältst keine Erinnerungen und deine Kontakte werden nicht benachrichtigt.",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "criticalNotificationsSubtitle": "\"Nicht stören\" umgehen",
+    "notificationsEnabledMessage": "Benachrichtigungen sind aktiviert. Du wirst bei Notfällen benachrichtigt.",
+    "criticalNotificationsWarning": "Kritische Benachrichtigungen können \"Nicht stören\" nicht umgehen. Aktiviere diese Berechtigung für maximale Zuverlässigkeit.",
+    "remindersSubtitle": "Vor Ablauf der Check-in-Frist",
+    "emailBackup": "E-Mail-Backup",
+    "lockWithBiometric": "Mit {{biometric}} sperren",
+    "exportData": "Meine Daten exportieren",
+    "exportDataSuccess": "Daten exportiert",
+    "exportDataSuccessMessage": "Deine Daten wurden erfolgreich exportiert.",
+    "exportDataDetails": "Details anzeigen",
+    "deleteConfirmTitle": "Konto löschen",
+    "deleteConfirm": "Möchtest du dein Konto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden. Alle deine Daten werden unwiderruflich gelöscht.",
+    "deleteButton": "Konto löschen",
+    "about": "Über Alles Gut"
   },
   "about": {
     "title": "Über Alles Gut",
@@ -151,7 +196,11 @@
     "website": "Webseite",
     "termsOfService": "Nutzungsbedingungen",
     "madeWithLove": "Mit ❤️ in Deutschland entwickelt",
-    "copyright": "© 2024 Alles Gut"
+    "copyright": "© 2024 Alles Gut",
+    "secureCheckInsSubtitle": "Einfache Bestätigung mit einem Tap",
+    "emergencyContactsSubtitle": "Bis zu 5 vertrauenswürdige Personen",
+    "endToEndEncryptedSubtitle": "Deine Daten bleiben privat",
+    "gdprCompliantSubtitle": "Made in Germany"
   },
   "acceptInvite": {
     "title": "Einladung annehmen",
@@ -166,7 +215,12 @@
     "couldNotAccept": "Die Einladung konnte nicht angenommen werden.",
     "cameraRequired": "Kamerazugriff erforderlich",
     "cameraPermissionText": "Um QR-Codes zu scannen, benötigt die App Zugriff auf deine Kamera.",
-    "allowCamera": "Kamera erlauben"
+    "allowCamera": "Kamera erlauben",
+    "enterCodeTitle": "Einladungscode eingeben",
+    "acceptButton": "Einladung annehmen",
+    "processing": "Wird verarbeitet...",
+    "cameraPermissionTitle": "Kamerazugriff erforderlich",
+    "cameraPermissionMessage": "Um QR-Codes zu scannen, benötigt die App Zugriff auf deine Kamera."
   },
   "lockScreen": {
     "appLocked": "App ist gesperrt",
@@ -233,7 +287,14 @@
     "deleteAccountFailed": "Konto konnte nicht gelöscht werden.",
     "logoutFailed": "Abmeldung fehlgeschlagen.",
     "inviteCreateFailed": "Einladung konnte nicht erstellt werden.",
-    "profileSaveFailed": "Profil konnte nicht gespeichert werden."
+    "profileSaveFailed": "Profil konnte nicht gespeichert werden.",
+    "couldNotSave": "Einstellung konnte nicht gespeichert werden.",
+    "couldNotPause": "Pause konnte nicht aktiviert werden.",
+    "couldNotResume": "Pause konnte nicht beendet werden.",
+    "couldNotExport": "Daten konnten nicht exportiert werden.",
+    "couldNotDelete": "Konto konnte nicht gelöscht werden.",
+    "couldNotLogout": "Abmeldung fehlgeschlagen.",
+    "couldNotCreateInvite": "Einladung konnte nicht erstellt werden."
   },
   "validation": {
     "emailRequired": "Bitte gib deine E-Mail-Adresse ein.",
