@@ -288,7 +288,7 @@ export default function SettingsScreen() {
             icon="document-text"
             iconColor="#5856D6"
             title={t('settings.privacyPolicy')}
-            onPress={() => Linking.openURL('https://allesgut.app/datenschutz')}
+            onPress={() => Linking.openURL('https://alles-gut.app/datenschutz')}
           />
           <ListRow
             icon="download"
@@ -324,7 +324,7 @@ export default function SettingsScreen() {
             icon="document"
             iconColor="#8E8E93"
             title={t('settings.imprint')}
-            onPress={() => Linking.openURL('https://allesgut.app/impressum')}
+            onPress={() => Linking.openURL('https://alles-gut.app/impressum')}
           />
         </ListSection>
 

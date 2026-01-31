@@ -30,7 +30,9 @@
       "Bash(do echo \"Language: $lang\")",
       "Bash(done)",
       "Bash(for lang in fr es it pt cs pl ja ko)",
-      "Bash(do echo \"*** $lang ***\")"
+      "Bash(do echo \"*** $lang ***\")",
+      "Bash(grep:*)",
+      "Bash(find:*)"
     ]
   }
 }

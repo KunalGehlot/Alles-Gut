@@ -10,7 +10,7 @@ router.use(authMiddleware);
 
 const MAX_CONTACTS = 5;
 const INVITATION_EXPIRY_DAYS = 7;
-const APP_URL = process.env.APP_URL || 'https://allesgut.app';
+const APP_URL = process.env.APP_URL || 'https://alles-gut.app';
 
 const acceptInvitationSchema = z.object({
   inviteCode: z.string().min(1),

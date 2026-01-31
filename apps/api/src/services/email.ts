@@ -2,8 +2,9 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@allesgut.app';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@alles-gut.app';
 const APP_NAME = 'Alles Gut';
+const LOGO_URL = process.env.LOGO_URL || 'https://alles-gut.app/assets/alles-gut-mark.png';
 
 interface SendVerificationCodeParams {
   to: string;
@@ -32,9 +33,7 @@ export async function sendVerificationCode({
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #212121; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 60px; height: 60px; background-color: #2D7D46; border-radius: 30px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-              <span style="color: white; font-size: 24px; font-weight: bold;">AG</span>
-            </div>
+            <img src="${LOGO_URL}" alt="Alles Gut" width="60" height="60" style="display: inline-block; margin-bottom: 15px;" />
             <h1 style="margin: 0; font-size: 24px; color: #212121;">Alles Gut</h1>
           </div>
 
@@ -100,9 +99,7 @@ export async function sendAlertEmail({
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #212121; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 60px; height: 60px; background-color: #E53935; border-radius: 30px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
-              <span style="color: white; font-size: 24px;">!</span>
-            </div>
+            <img src="${LOGO_URL}" alt="Alles Gut" width="60" height="60" style="display: inline-block; margin-bottom: 15px;" />
             <h1 style="margin: 0; font-size: 24px; color: #E53935;">Wichtige Mitteilung</h1>
           </div>
 

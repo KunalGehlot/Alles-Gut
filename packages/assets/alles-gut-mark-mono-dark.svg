@@ -1,0 +1,20 @@
+<svg viewBox="0 0 50 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Alles Gut - Logo Mark (Monochrome Dark) -->
+  <!-- Question mark curve -->
+  <path 
+    d="M9 24 C9 8 41 8 41 24 C41 36 25 36 25 50" 
+    stroke="#111111" 
+    stroke-width="5" 
+    fill="none" 
+    stroke-linecap="round"
+  />
+  <!-- Checkmark -->
+  <path 
+    d="M12 64 L22 76 L42 52" 
+    stroke="#111111" 
+    stroke-width="5" 
+    fill="none" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+  />
+</svg>

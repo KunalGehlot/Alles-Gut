@@ -82,19 +82,19 @@ export default function AboutScreen() {
             icon="globe-outline"
             iconColor="#007AFF"
             title={t('about.website')}
-            onPress={() => Linking.openURL('https://allesgut.app')}
+            onPress={() => Linking.openURL('https://alles-gut.app')}
           />
           <ListRow
             icon="document-text-outline"
             iconColor="#5856D6"
             title={t('settings.privacyPolicy')}
-            onPress={() => Linking.openURL('https://allesgut.app/datenschutz')}
+            onPress={() => Linking.openURL('https://alles-gut.app/datenschutz')}
           />
           <ListRow
             icon="document-outline"
             iconColor="#8E8E93"
             title={t('about.termsOfService')}
-            onPress={() => Linking.openURL('https://allesgut.app/agb')}
+            onPress={() => Linking.openURL('https://alles-gut.app/agb')}
           />
         </ListSection>
 

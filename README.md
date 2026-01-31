@@ -193,6 +193,12 @@ Currently, the project relies on **manual verification**. Use the following flow
 
 ## Deployment
 
+### Asset Generation
+If you need to regenerate app icons or splash screens (e.g. after updating logos in `packages/assets`), run:
+```bash
+npm run assets
+```
+
 ### API (Railway)
 
 The API includes a `Dockerfile` and `railway.toml` for easy deployment on [Railway](https://railway.app/).

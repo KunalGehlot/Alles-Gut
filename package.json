@@ -12,7 +12,8 @@
     "lint": "turbo run lint",
     "clean": "turbo run clean",
     "mobile": "npm run dev --workspace=apps/mobile",
-    "api": "npm run dev --workspace=apps/api"
+    "api": "npm run dev --workspace=apps/api",
+    "assets": "node scripts/generate-assets.js"
   },
   "devDependencies": {
     "@types/react": "~19.1.10",

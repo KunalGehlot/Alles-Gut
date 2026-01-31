@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Spacing, BorderRadius } from '@/constants/typography';
-import { Button } from '@/components';
+import { Button, Logo } from '@/components';
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -16,9 +16,7 @@ export default function WelcomeScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.content}>
         <View style={styles.logoContainer}>
-          <View style={[styles.logoCircle, { backgroundColor: theme.primary }]}>
-            <Ionicons name="heart" size={48} color="#FFFFFF" />
-          </View>
+          <Logo size={80} />
           <Text style={[styles.appName, { color: theme.text }]}>{t('app.name')}</Text>
           <Text style={[styles.tagline, { color: theme.textSecondary }]}>
             {t('app.tagline')}
